@@ -1,0 +1,33 @@
+name: Update contribution data
+
+on:
+  schedule:
+    - cron: "17 3 * * *"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: update-contributions
+  cancel-in-progress: true
+
+jobs:
+  update:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Generate data/contributions.json
+        env:
+          CONTRIB_PAT: ${{ secrets.CONTRIB_PAT }}
+        run: node scripts/generate-contributions.js
+
+      - name: Commit and push if changed
+        run: |
+          git config --local user.email "github-actions[bot]@users.noreply.github.com"
+          git config --local user.name "github-actions[bot]"
+          git add data/contributions.json
+          git diff --staged --quiet || git commit -m "chore: refresh contribution data"
+          git push

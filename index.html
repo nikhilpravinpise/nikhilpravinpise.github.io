@@ -1,0 +1,463 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>nikhil@github ~ interactive terminal</title>
+<meta name="description" content="Nikhil Pravin Pise — interactive terminal-style GitHub profile with live contribution stats." />
+<style>
+  :root{
+    --bg:#0d1117; --bg2:#161b22; --frame:#30363d; --muted:#8b949e;
+    --green:#39d353; --green-dim:#146c37; --cyan:#58a6ff; --white:#e6edf3;
+    --red:#ff5f56; --yellow:#ffbd2e;
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;background:var(--bg);color:var(--white);
+    font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;}
+  body{min-height:100vh;display:flex;flex-direction:column;align-items:center;
+    padding:24px 14px 60px;}
+  a{color:var(--cyan);text-decoration:none;}
+  a:hover{text-decoration:underline;}
+
+  .wrap{width:100%;max-width:900px;}
+
+  .hero{text-align:center;margin-bottom:22px;}
+  .hero pre{font-size:clamp(6px,1.6vw,13px);line-height:1.15;color:var(--green);
+    margin:0 0 6px;white-space:pre;overflow-x:auto;}
+  .hero .tagline{color:var(--muted);font-size:14px;}
+  .hero img{width:min(260px,60vw);border-radius:10px;border:1px solid var(--frame);margin-top:14px;}
+
+  .window{background:var(--bg);border:1px solid var(--frame);border-radius:10px;
+    overflow:hidden;box-shadow:0 20px 60px -20px rgba(0,0,0,.6);}
+  .titlebar{display:flex;align-items:center;gap:8px;padding:9px 14px;
+    background:var(--bg2);border-bottom:1px solid var(--frame);position:relative;}
+  .dot{width:11px;height:11px;border-radius:50%;}
+  .titlebar .label{position:absolute;left:0;right:0;text-align:center;color:var(--muted);font-size:12px;}
+
+  .term{padding:16px;min-height:360px;max-height:60vh;overflow-y:auto;font-size:13.5px;line-height:1.55;}
+  .term .line{white-space:pre-wrap;word-break:break-word;}
+  .term .prompt-line{display:flex;gap:8px;}
+  .term .prompt-tag{color:var(--green);flex-shrink:0;}
+  .out-cmd{color:var(--cyan);}
+  .out-dim{color:var(--muted);}
+  .out-green{color:var(--green);}
+  .out-white{color:var(--white);}
+  .out-yellow{color:var(--yellow);}
+
+  .inputRow{display:flex;gap:8px;align-items:center;padding:0 16px 16px;}
+  .inputRow .prompt-tag{color:var(--green);}
+  #cmdInput{flex:1;background:transparent;border:none;outline:none;color:var(--white);
+    font-family:inherit;font-size:13.5px;caret-color:var(--green);}
+  .cursor{display:inline-block;width:8px;height:15px;background:var(--green);
+    animation:blink 1s steps(1) infinite;vertical-align:middle;}
+  @keyframes blink{50%{opacity:0;}}
+
+  .hint{text-align:center;color:var(--muted);font-size:12px;margin-top:10px;}
+  .hint kbd{background:var(--bg2);border:1px solid var(--frame);border-radius:4px;
+    padding:1px 6px;color:var(--white);}
+
+  /* stat cards */
+  .stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));
+    gap:10px;margin:18px 0;}
+  .stat{border:1px solid var(--frame);border-radius:8px;padding:12px;background:var(--bg2);}
+  .stat .num{font-size:22px;color:var(--green);font-weight:600;}
+  .stat .lbl{font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:.04em;margin-top:2px;}
+
+  /* heatmap */
+  .heatmap-wrap{overflow-x:auto;padding:4px 0;}
+  .heatmap{display:grid;grid-auto-flow:column;grid-template-rows:repeat(7,10px);gap:2px;}
+  .cell{width:10px;height:10px;border-radius:2px;cursor:pointer;transition:transform .08s;}
+  .cell:hover{transform:scale(1.6);outline:1px solid var(--white);}
+  .legend{display:flex;align-items:center;gap:4px;font-size:11px;color:var(--muted);margin-top:8px;}
+  .legend .cell{cursor:default;}
+  .legend .cell:hover{transform:none;outline:none;}
+  #tooltip{position:fixed;pointer-events:none;background:#1c2128;border:1px solid var(--frame);
+    color:var(--white);font-size:11.5px;padding:4px 8px;border-radius:6px;display:none;z-index:50;
+    box-shadow:0 8px 20px rgba(0,0,0,.5);}
+
+  footer{margin-top:26px;text-align:center;color:var(--muted);font-size:12px;}
+  footer .links{margin-bottom:8px;}
+  footer .links a{margin:0 8px;}
+
+  @media (max-width:520px){
+    .term{font-size:12.5px;}
+    .hero pre{font-size:6px;}
+  }
+</style>
+</head>
+<body>
+
+<div class="wrap">
+
+  <div class="hero">
+    <pre id="bannerArt"></pre>
+    <div class="tagline">Pre-final CS (Data Science) @ DJSCE · ML Research Intern @ IIT Guwahati · AI/ML Builder</div>
+  </div>
+
+  <div class="window">
+    <div class="titlebar">
+      <div class="dot" style="background:var(--red)"></div>
+      <div class="dot" style="background:var(--yellow)"></div>
+      <div class="dot" style="background:#27c93f"></div>
+      <div class="label">nikhil@github: ~</div>
+    </div>
+    <div class="term" id="term"></div>
+    <div class="inputRow">
+      <span class="prompt-tag">nikhil@github:~$</span>
+      <input id="cmdInput" autocomplete="off" autocapitalize="off" spellcheck="false" />
+      <span class="cursor" id="fakeCursor"></span>
+    </div>
+  </div>
+
+  <div class="hint">type <kbd>help</kbd> to see commands · try <kbd>contributions</kbd>, <kbd>projects</kbd>, or <kbd>matrix</kbd></div>
+
+  <footer>
+    <div class="links">
+      <a href="https://www.nikhilpise.me" target="_blank" rel="noopener">portfolio</a>·
+      <a href="https://github.com/nikhilpravinpise" target="_blank" rel="noopener">github</a>·
+      <a href="https://linkedin.com/in/nikhil-pravin-pise" target="_blank" rel="noopener">linkedin</a>·
+      <a href="mailto:nikhilpise2006@gmail.com">email</a>
+    </div>
+    <div>rendered client-side, no build step · data refreshes daily</div>
+  </footer>
+
+</div>
+
+<div id="tooltip"></div>
+<canvas id="matrixCanvas" style="position:fixed;inset:0;z-index:-1;display:none;"></canvas>
+
+<script>
+/* =========================================================================
+   Fallback contribution data (baked in at build time). If the live fetch to
+   raw.githubusercontent.com fails -- offline, CORS hiccup, whatever -- the
+   page still works and shows real numbers as of the last sync.
+   ========================================================================= */
+window.__FALLBACK_DATA = {"username":"nikhilpravinpise","generated_at":"2026-08-24T11:15:53.361Z","range":{"start":"2025-08-24","end":"2026-08-24"},"total_contributions":954,"active_days":172,"avg_per_active_day":5.5,"current_streak":{"length":2,"start":"2026-08-23","end":"2026-08-24"},"longest_streak":{"length":10,"start":"2025-11-16","end":"2025-11-25"},"best_day":{"date":"2026-08-17","count":40},"monthly":[{"month":"2025-08","total":17},{"month":"2025-09","total":40},{"month":"2025-10","total":56},{"month":"2025-11","total":128},{"month":"2025-12","total":116},{"month":"2026-01","total":37},{"month":"2026-02","total":62},{"month":"2026-03","total":30},{"month":"2026-04","total":118},{"month":"2026-05","total":49},{"month":"2026-06","total":76},{"month":"2026-07","total":68},{"month":"2026-08","total":157}],"days":[{"date":"2025-08-24","count":0},{"date":"2025-08-25","count":4},{"date":"2025-08-26","count":1},{"date":"2025-08-27","count":1},{"date":"2025-08-28","count":0},{"date":"2025-08-29","count":0},{"date":"2025-08-30","count":5},{"date":"2025-08-31","count":6},{"date":"2025-09-01","count":0},{"date":"2025-09-02","count":1},{"date":"2025-09-03","count":4},{"date":"2025-09-04","count":0},{"date":"2025-09-05","count":0},{"date":"2025-09-06","count":0},{"date":"2025-09-07","count":0},{"date":"2025-09-08","count":0},{"date":"2025-09-09","count":0},{"date":"2025-09-10","count":4},{"date":"2025-09-11","count":0},{"date":"2025-09-12","count":2},{"date":"2025-09-13","count":15},{"date":"2025-09-14","count":3},{"date":"2025-09-15","count":3},{"date":"2025-09-16","count":0},{"date":"2025-09-17","count":0},{"date":"2025-09-18","count":0},{"date":"2025-09-19","count":0},{"date":"2025-09-20","count":0},{"date":"2025-09-21","count":0},{"date":"2025-09-22","count":0},{"date":"2025-09-23","count":3},{"date":"2025-09-24","count":0},{"date":"2025-09-25","count":0},{"date":"2025-09-26","count":4},{"date":"2025-09-27","count":1},{"date":"2025-09-28","count":0},{"date":"2025-09-29","count":0},{"date":"2025-09-30","count":0},{"date":"2025-10-01","count":0},{"date":"2025-10-02","count":0},{"date":"2025-10-03","count":1},{"date":"2025-10-04","count":8},{"date":"2025-10-05","count":0},{"date":"2025-10-06","count":0},{"date":"2025-10-07","count":0},{"date":"2025-10-08","count":5},{"date":"2025-10-09","count":0},{"date":"2025-10-10","count":0},{"date":"2025-10-11","count":0},{"date":"2025-10-12","count":8},{"date":"2025-10-13","count":0},{"date":"2025-10-14","count":0},{"date":"2025-10-15","count":0},{"date":"2025-10-16","count":0},{"date":"2025-10-17","count":0},{"date":"2025-10-18","count":0},{"date":"2025-10-19","count":0},{"date":"2025-10-20","count":0},{"date":"2025-10-21","count":0},{"date":"2025-10-22","count":0},{"date":"2025-10-23","count":0},{"date":"2025-10-24","count":0},{"date":"2025-10-25","count":0},{"date":"2025-10-26","count":4},{"date":"2025-10-27","count":0},{"date":"2025-10-28","count":0},{"date":"2025-10-29","count":2},{"date":"2025-10-30","count":0},{"date":"2025-10-31","count":28},{"date":"2025-11-01","count":4},{"date":"2025-11-02","count":20},{"date":"2025-11-03","count":0},{"date":"2025-11-04","count":0},{"date":"2025-11-05","count":5},{"date":"2025-11-06","count":5},{"date":"2025-11-07","count":0},{"date":"2025-11-08","count":1},{"date":"2025-11-09","count":13},{"date":"2025-11-10","count":0},{"date":"2025-11-11","count":0},{"date":"2025-11-12","count":0},{"date":"2025-11-13","count":0},{"date":"2025-11-14","count":0},{"date":"2025-11-15","count":0},{"date":"2025-11-16","count":5},{"date":"2025-11-17","count":3},{"date":"2025-11-18","count":13},{"date":"2025-11-19","count":16},{"date":"2025-11-20","count":3},{"date":"2025-11-21","count":5},{"date":"2025-11-22","count":15},{"date":"2025-11-23","count":2},{"date":"2025-11-24","count":1},{"date":"2025-11-25","count":2},{"date":"2025-11-26","count":0},{"date":"2025-11-27","count":1},{"date":"2025-11-28","count":4},{"date":"2025-11-29","count":6},{"date":"2025-11-30","count":4},{"date":"2025-12-01","count":0},{"date":"2025-12-02","count":6},{"date":"2025-12-03","count":5},{"date":"2025-12-04","count":0},{"date":"2025-12-05","count":0},{"date":"2025-12-06","count":0},{"date":"2025-12-07","count":6},{"date":"2025-12-08","count":1},{"date":"2025-12-09","count":1},{"date":"2025-12-10","count":11},{"date":"2025-12-11","count":6},{"date":"2025-12-12","count":0},{"date":"2025-12-13","count":1},{"date":"2025-12-14","count":0},{"date":"2025-12-15","count":26},{"date":"2025-12-16","count":0},{"date":"2025-12-17","count":3},{"date":"2025-12-18","count":0},{"date":"2025-12-19","count":7},{"date":"2025-12-20","count":0},{"date":"2025-12-21","count":0},{"date":"2025-12-22","count":1},{"date":"2025-12-23","count":0},{"date":"2025-12-24","count":11},{"date":"2025-12-25","count":3},{"date":"2025-12-26","count":2},{"date":"2025-12-27","count":9},{"date":"2025-12-28","count":2},{"date":"2025-12-29","count":1},{"date":"2025-12-30","count":0},{"date":"2025-12-31","count":14},{"date":"2026-01-01","count":0},{"date":"2026-01-02","count":2},{"date":"2026-01-03","count":1},{"date":"2026-01-04","count":0},{"date":"2026-01-05","count":5},{"date":"2026-01-06","count":2},{"date":"2026-01-07","count":2},{"date":"2026-01-08","count":0},{"date":"2026-01-09","count":0},{"date":"2026-01-10","count":0},{"date":"2026-01-11","count":0},{"date":"2026-01-12","count":0},{"date":"2026-01-13","count":2},{"date":"2026-01-14","count":0},{"date":"2026-01-15","count":2},{"date":"2026-01-16","count":0},{"date":"2026-01-17","count":0},{"date":"2026-01-18","count":0},{"date":"2026-01-19","count":0},{"date":"2026-01-20","count":3},{"date":"2026-01-21","count":12},{"date":"2026-01-22","count":2},{"date":"2026-01-23","count":2},{"date":"2026-01-24","count":0},{"date":"2026-01-25","count":1},{"date":"2026-01-26","count":1},{"date":"2026-01-27","count":0},{"date":"2026-01-28","count":0},{"date":"2026-01-29","count":0},{"date":"2026-01-30","count":0},{"date":"2026-01-31","count":0},{"date":"2026-02-01","count":1},{"date":"2026-02-02","count":7},{"date":"2026-02-03","count":14},{"date":"2026-02-04","count":0},{"date":"2026-02-05","count":0},{"date":"2026-02-06","count":4},{"date":"2026-02-07","count":4},{"date":"2026-02-08","count":5},{"date":"2026-02-09","count":0},{"date":"2026-02-10","count":0},{"date":"2026-02-11","count":0},{"date":"2026-02-12","count":0},{"date":"2026-02-13","count":0},{"date":"2026-02-14","count":0},{"date":"2026-02-15","count":3},{"date":"2026-02-16","count":2},{"date":"2026-02-17","count":2},{"date":"2026-02-18","count":0},{"date":"2026-02-19","count":0},{"date":"2026-02-20","count":0},{"date":"2026-02-21","count":0},{"date":"2026-02-22","count":0},{"date":"2026-02-23","count":13},{"date":"2026-02-24","count":3},{"date":"2026-02-25","count":3},{"date":"2026-02-26","count":0},{"date":"2026-02-27","count":1},{"date":"2026-02-28","count":0},{"date":"2026-03-01","count":0},{"date":"2026-03-02","count":0},{"date":"2026-03-03","count":0},{"date":"2026-03-04","count":0},{"date":"2026-03-05","count":0},{"date":"2026-03-06","count":0},{"date":"2026-03-07","count":0},{"date":"2026-03-08","count":0},{"date":"2026-03-09","count":15},{"date":"2026-03-10","count":2},{"date":"2026-03-11","count":0},{"date":"2026-03-12","count":0},{"date":"2026-03-13","count":7},{"date":"2026-03-14","count":5},{"date":"2026-03-15","count":0},{"date":"2026-03-16","count":0},{"date":"2026-03-17","count":0},{"date":"2026-03-18","count":0},{"date":"2026-03-19","count":0},{"date":"2026-03-20","count":0},{"date":"2026-03-21","count":0},{"date":"2026-03-22","count":0},{"date":"2026-03-23","count":0},{"date":"2026-03-24","count":0},{"date":"2026-03-25","count":0},{"date":"2026-03-26","count":0},{"date":"2026-03-27","count":0},{"date":"2026-03-28","count":0},{"date":"2026-03-29","count":0},{"date":"2026-03-30","count":0},{"date":"2026-03-31","count":1},{"date":"2026-04-01","count":2},{"date":"2026-04-02","count":0},{"date":"2026-04-03","count":2},{"date":"2026-04-04","count":5},{"date":"2026-04-05","count":15},{"date":"2026-04-06","count":6},{"date":"2026-04-07","count":8},{"date":"2026-04-08","count":2},{"date":"2026-04-09","count":13},{"date":"2026-04-10","count":0},{"date":"2026-04-11","count":2},{"date":"2026-04-12","count":0},{"date":"2026-04-13","count":0},{"date":"2026-04-14","count":0},{"date":"2026-04-15","count":0},{"date":"2026-04-16","count":0},{"date":"2026-04-17","count":15},{"date":"2026-04-18","count":2},{"date":"2026-04-19","count":4},{"date":"2026-04-20","count":0},{"date":"2026-04-21","count":20},{"date":"2026-04-22","count":2},{"date":"2026-04-23","count":2},{"date":"2026-04-24","count":1},{"date":"2026-04-25","count":11},{"date":"2026-04-26","count":5},{"date":"2026-04-27","count":0},{"date":"2026-04-28","count":0},{"date":"2026-04-29","count":0},{"date":"2026-04-30","count":1},{"date":"2026-05-01","count":0},{"date":"2026-05-02","count":1},{"date":"2026-05-03","count":10},{"date":"2026-05-04","count":0},{"date":"2026-05-05","count":10},{"date":"2026-05-06","count":3},{"date":"2026-05-07","count":0},{"date":"2026-05-08","count":2},{"date":"2026-05-09","count":3},{"date":"2026-05-10","count":2},{"date":"2026-05-11","count":7},{"date":"2026-05-12","count":0},{"date":"2026-05-13","count":0},{"date":"2026-05-14","count":3},{"date":"2026-05-15","count":0},{"date":"2026-05-16","count":0},{"date":"2026-05-17","count":0},{"date":"2026-05-18","count":0},{"date":"2026-05-19","count":0},{"date":"2026-05-20","count":0},{"date":"2026-05-21","count":0},{"date":"2026-05-22","count":0},{"date":"2026-05-23","count":0},{"date":"2026-05-24","count":0},{"date":"2026-05-25","count":0},{"date":"2026-05-26","count":0},{"date":"2026-05-27","count":7},{"date":"2026-05-28","count":1},{"date":"2026-05-29","count":0},{"date":"2026-05-30","count":0},{"date":"2026-05-31","count":0},{"date":"2026-06-01","count":0},{"date":"2026-06-02","count":0},{"date":"2026-06-03","count":0},{"date":"2026-06-04","count":1},{"date":"2026-06-05","count":0},{"date":"2026-06-06","count":0},{"date":"2026-06-07","count":1},{"date":"2026-06-08","count":0},{"date":"2026-06-09","count":0},{"date":"2026-06-10","count":0},{"date":"2026-06-11","count":16},{"date":"2026-06-12","count":4},{"date":"2026-06-13","count":11},{"date":"2026-06-14","count":17},{"date":"2026-06-15","count":5},{"date":"2026-06-16","count":0},{"date":"2026-06-17","count":2},{"date":"2026-06-18","count":3},{"date":"2026-06-19","count":0},{"date":"2026-06-20","count":0},{"date":"2026-06-21","count":0},{"date":"2026-06-22","count":2},{"date":"2026-06-23","count":0},{"date":"2026-06-24","count":3},{"date":"2026-06-25","count":0},{"date":"2026-06-26","count":2},{"date":"2026-06-27","count":1},{"date":"2026-06-28","count":1},{"date":"2026-06-29","count":1},{"date":"2026-06-30","count":6},{"date":"2026-07-01","count":0},{"date":"2026-07-02","count":0},{"date":"2026-07-03","count":0},{"date":"2026-07-04","count":0},{"date":"2026-07-05","count":0},{"date":"2026-07-06","count":1},{"date":"2026-07-07","count":0},{"date":"2026-07-08","count":0},{"date":"2026-07-09","count":0},{"date":"2026-07-10","count":2},{"date":"2026-07-11","count":4},{"date":"2026-07-12","count":0},{"date":"2026-07-13","count":0},{"date":"2026-07-14","count":0},{"date":"2026-07-15","count":1},{"date":"2026-07-16","count":3},{"date":"2026-07-17","count":5},{"date":"2026-07-18","count":0},{"date":"2026-07-19","count":3},{"date":"2026-07-20","count":1},{"date":"2026-07-21","count":2},{"date":"2026-07-22","count":1},{"date":"2026-07-23","count":9},{"date":"2026-07-24","count":0},{"date":"2026-07-25","count":18},{"date":"2026-07-26","count":2},{"date":"2026-07-27","count":0},{"date":"2026-07-28","count":1},{"date":"2026-07-29","count":10},{"date":"2026-07-30","count":2},{"date":"2026-07-31","count":3},{"date":"2026-08-01","count":0},{"date":"2026-08-02","count":5},{"date":"2026-08-03","count":4},{"date":"2026-08-04","count":1},{"date":"2026-08-05","count":0},{"date":"2026-08-06","count":0},{"date":"2026-08-07","count":3},{"date":"2026-08-08","count":8},{"date":"2026-08-09","count":0},{"date":"2026-08-10","count":3},{"date":"2026-08-11","count":4},{"date":"2026-08-12","count":1},{"date":"2026-08-13","count":3},{"date":"2026-08-14","count":0},{"date":"2026-08-15","count":10},{"date":"2026-08-16","count":39},{"date":"2026-08-17","count":40},{"date":"2026-08-18","count":16},{"date":"2026-08-19","count":0},{"date":"2026-08-20","count":2},{"date":"2026-08-21","count":2},{"date":"2026-08-22","count":0},{"date":"2026-08-23","count":2},{"date":"2026-08-24","count":14}]};
+
+const LIVE_DATA_URL = "./data/contributions.json";
+
+const BANNER = `    _   ________ __ __  ________       ____  _________ ______
+   / | / /  _/ //_// / / /  _/ /      / __ \\/  _/ ___// ____/
+  /  |/ // // ,<  / /_/ // // /      / /_/ // / \\__ \\/ __/
+ / /|  // // /| |/ __  // // /___   / ____// / ___/ / /___
+/_/ |_/___/_/ |_/_/ /_/___/_____/  /_/   /___//____/_____/`;
+document.getElementById("bannerArt").textContent = BANNER;
+
+/* ---------------------------------------------------------------------- */
+const term = document.getElementById("term");
+const input = document.getElementById("cmdInput");
+const tooltip = document.getElementById("tooltip");
+
+function line(html, cls) {
+  const div = document.createElement("div");
+  div.className = "line" + (cls ? " " + cls : "");
+  div.innerHTML = html;
+  term.appendChild(div);
+  term.scrollTop = term.scrollHeight;
+  return div;
+}
+function blank() { line("&nbsp;"); }
+
+let DATA = null;
+window.__getData = () => DATA; // test/debug hook
+
+async function loadData() {
+  try {
+    const res = await fetch(LIVE_DATA_URL, { cache: "no-store" });
+    if (!res.ok) throw new Error("bad status " + res.status);
+    DATA = await res.json();
+  } catch (e) {
+    DATA = window.__FALLBACK_DATA;
+  }
+  renderStats();
+}
+
+/* ---------------------------------------------------------------------- */
+function countUp(el, target, suffix) {
+  const dur = 900;
+  const start = performance.now();
+  function tick(now) {
+    const p = Math.min(1, (now - start) / dur);
+    const val = Math.round(target * (1 - Math.pow(1 - p, 3)));
+    el.textContent = val.toLocaleString() + (suffix || "");
+    if (p < 1) requestAnimationFrame(tick);
+  }
+  requestAnimationFrame(tick);
+}
+
+function renderStats() {
+  if (!DATA) return;
+  const box = document.getElementById("statsBox");
+  if (!box) return;
+  const stats = [
+    ["total", DATA.total_contributions, "contributions"],
+    ["current", DATA.current_streak.length, "day streak"],
+    ["longest", DATA.longest_streak.length, "day best streak"],
+    ["best", DATA.best_day.count, "in one day"],
+  ];
+  box.innerHTML = "";
+  stats.forEach(([key, val, label]) => {
+    const card = document.createElement("div");
+    card.className = "stat";
+    card.innerHTML = `<div class="num" data-key="${key}">0</div><div class="lbl">${label}</div>`;
+    box.appendChild(card);
+    countUp(card.querySelector(".num"), val);
+  });
+}
+
+/* ---------------------------------------------------------------------- */
+function levelFor(count) {
+  if (count === 0) return 0;
+  if (count <= 5) return 1;
+  if (count <= 15) return 2;
+  if (count <= 30) return 3;
+  if (count <= 50) return 4;
+  return 5;
+}
+const PALETTE = ["#1c2128", "#0e4429", "#146c37", "#26a648", "#39d353", "#7cf2a0"];
+
+function buildHeatmapEl() {
+  const wrap = document.createElement("div");
+  wrap.className = "heatmap-wrap";
+  const grid = document.createElement("div");
+  grid.className = "heatmap";
+
+  const days = DATA.days;
+  const first = new Date(days[0].date + "T00:00:00");
+  const leadPad = (first.getDay()); // sunday=0 already
+  let col = new Array(leadPad).fill(null);
+
+  const cols = [];
+  days.forEach((d) => {
+    const date = new Date(d.date + "T00:00:00");
+    const weekday = date.getDay();
+    while (col.length < weekday) col.push(null);
+    col.push(d);
+    if (col.length === 7) { cols.push(col); col = []; }
+  });
+  if (col.length) { while (col.length < 7) col.push(null); cols.push(col); }
+
+  cols.forEach((column) => {
+    column.forEach((d) => {
+      const cell = document.createElement("div");
+      cell.className = "cell";
+      if (!d) {
+        cell.style.background = "transparent";
+        cell.style.cursor = "default";
+      } else {
+        const lvl = levelFor(d.count);
+        cell.style.background = PALETTE[lvl];
+        cell.addEventListener("mousemove", (e) => {
+          tooltip.style.display = "block";
+          tooltip.style.left = e.clientX + 14 + "px";
+          tooltip.style.top = e.clientY + 14 + "px";
+          tooltip.textContent = `${d.date}: ${d.count} contribution${d.count === 1 ? "" : "s"}`;
+        });
+        cell.addEventListener("mouseleave", () => { tooltip.style.display = "none"; });
+      }
+      grid.appendChild(cell);
+    });
+  });
+
+  wrap.appendChild(grid);
+
+  const legend = document.createElement("div");
+  legend.className = "legend";
+  legend.innerHTML = "less ";
+  PALETTE.forEach((c) => {
+    legend.innerHTML += `<span class="cell" style="background:${c}"></span> `;
+  });
+  legend.innerHTML += " more";
+  wrap.appendChild(legend);
+
+  return wrap;
+}
+
+/* ---------------------------------------------------------------------- */
+const COMMANDS = {
+  help() {
+    line(`<span class="out-white">available commands:</span>`);
+    [
+      ["whoami", "who is this guy anyway"],
+      ["experience", "work history"],
+      ["skills", "tech stack"],
+      ["projects", "things I've shipped"],
+      ["contributions", "live GitHub contribution heatmap"],
+      ["streak", "current / longest streak"],
+      ["contact", "how to reach me"],
+      ["photo", "github avatar"],
+      ["matrix", "toggle a little fun"],
+      ["clear", "clear the terminal"],
+    ].forEach(([c, d]) => line(`  <span class="out-cmd">${c.padEnd(15)}</span><span class="out-dim">${d}</span>`));
+  },
+  whoami() {
+    line(`<span class="out-white">Pre-final year CS (Data Science) @ SVKM's DJSCE, 9.14 CGPA, based in Mumbai, IN</span>`);
+    line(`<span class="out-dim">Currently: Summer ML Research Intern @ IIT Guwahati · Head of ML @ DJS S4DS</span>`);
+    line(`<span class="out-dim">3x Hackathon Winner · 8+ National Hackathon Finalist</span>`);
+    line(`<span class="out-dim">3 preliminary asteroid discoveries (IASC x NASA) · builds AI agents & on-device ML</span>`);
+  },
+  experience() {
+    [
+      ["Jun 2026 - now", "Summer ML Research Intern", "IIT Guwahati"],
+      ["Jul 2026 - now", "Head of ML", "DJS S4DS"],
+      ["Sept 2024 - now", "B.Tech CSE (Data Science)", "SVKM's DJSCE"],
+    ].forEach(([d, r, c]) => line(`<span class="out-green">${d.padEnd(17)}</span><span class="out-white">${r.padEnd(28)}</span><span class="out-dim">${c}</span>`));
+  },
+  skills() {
+    line(`<span class="out-cmd">languages</span>  Python, C/C++, Java, JavaScript (ES6+), Dart, SQL, Bash, HTML5, CSS3`);
+    line(`<span class="out-cmd">frameworks</span> PyTorch, TensorFlow, Scikit-Learn, Hugging Face, LangGraph, Flask, FastAPI, React, Flutter, Docker, Git`);
+    line(`<span class="out-cmd">ai / ml  </span>  LLMs, RAG, AI Agents, MCP, On-Device LLMs, GraphQL, REST APIs, OAuth, Webhooks`);
+  },
+  projects() {
+    [
+      ["Cairn", "Offline FEMA building triage — Gemma 4 (2B) fully on-device via LiteRT-LM", "https://github.com/nikhilpravinpise/Cairn"],
+      ["Project Aether", "GraphQL-first Medium scraper — Apify Actor + MCP server + Gradio UI, 15x faster", "https://github.com/nikhilpravinpise/Medium-Agent"],
+      ["Parmar", "AI outbound sales qualification — Vapi voice agent + Twilio WhatsApp alerts", "https://github.com/nikhilpravinpise/Parmar"],
+      ["ZerveChurn", "SaaS churn prediction — 409K events, PyTorch GraphSAGE, 0.94 ROC-AUC", "https://github.com/nikhilpravinpise/ZerveChurn"],
+    ].forEach(([n, d, url]) => {
+      line(`<span class="out-cmd">&gt; ${n}</span>`);
+      line(`  <span class="out-dim">${d}</span>`);
+      line(`  <a href="${url}" target="_blank" rel="noopener">${url}</a>`);
+    });
+  },
+  contact() {
+    line(`<span class="out-white">portfolio</span>  <a href="https://www.nikhilpise.me" target="_blank">nikhilpise.me</a>`);
+    line(`<span class="out-white">linkedin </span>  <a href="https://linkedin.com/in/nikhil-pravin-pise" target="_blank">linkedin.com/in/nikhil-pravin-pise</a>`);
+    line(`<span class="out-white">github   </span>  <a href="https://github.com/nikhilpravinpise" target="_blank">github.com/nikhilpravinpise</a>`);
+    line(`<span class="out-white">email    </span>  <a href="mailto:nikhilpise2006@gmail.com">nikhilpise2006@gmail.com</a>`);
+  },
+  photo() {
+    const img = document.createElement("img");
+    img.src = "https://github.com/nikhilpravinpise.png";
+    img.style.maxWidth = "100%";
+    img.style.borderRadius = "8px";
+    img.style.border = "1px solid var(--frame)";
+    img.alt = "github avatar";
+    const div = document.createElement("div");
+    div.className = "line";
+    div.appendChild(img);
+    term.appendChild(div);
+    term.scrollTop = term.scrollHeight;
+  },
+  streak() {
+    if (!DATA) { line(`<span class="out-dim">loading contribution data...</span>`); return; }
+    line(`<span class="out-green">current streak:</span>  ${DATA.current_streak.length} days (${DATA.current_streak.start} → ${DATA.current_streak.end})`);
+    line(`<span class="out-green">longest streak:</span>  ${DATA.longest_streak.length} days (${DATA.longest_streak.start} → ${DATA.longest_streak.end})`);
+    line(`<span class="out-green">best day:</span>       ${DATA.best_day.count} contributions on ${DATA.best_day.date}`);
+    line(`<span class="out-green">total:</span>          ${DATA.total_contributions.toLocaleString()} contributions since ${DATA.range.start}`);
+  },
+  contributions() {
+    if (!DATA) { line(`<span class="out-dim">loading contribution data...</span>`); return; }
+    line(`<span class="out-dim">${DATA.total_contributions.toLocaleString()} contributions · ${DATA.range.start} → ${DATA.range.end}</span>`);
+    const div = document.createElement("div");
+    div.className = "line";
+    div.appendChild(buildHeatmapEl());
+    term.appendChild(div);
+    term.scrollTop = term.scrollHeight;
+    line(`<span class="out-dim">hover a cell for the exact date and count</span>`);
+  },
+  matrix() {
+    toggleMatrix();
+    line(`<span class="out-dim">${matrixOn ? "matrix mode on -- type 'matrix' again to turn it off" : "back to normal"}</span>`);
+  },
+  clear() {
+    term.innerHTML = "";
+  },
+  banner() {
+    line(`<pre style="color:var(--green);margin:0;font-size:9px;">${BANNER}</pre>`);
+  },
+  sudo(args) {
+    line(`<span class="out-yellow">[sudo] password for nikhil:</span> <span class="out-dim">nice try. this is a static site.</span>`);
+  },
+};
+COMMANDS["about"] = COMMANDS.whoami;
+COMMANDS["ls"] = COMMANDS.projects;
+
+function runCommand(raw) {
+  const trimmed = raw.trim();
+  line(`<span class="prompt-tag">nikhil@github:~$</span> <span class="out-white">${escapeHtml(trimmed)}</span>`, "prompt-line");
+  if (!trimmed) return;
+  const [cmd, ...args] = trimmed.split(/\s+/);
+  const key = cmd.toLowerCase();
+  if (key === "open") {
+    const target = (args[0] || "").toLowerCase();
+    const map = {
+      portfolio: "https://www.nikhilpise.me",
+      linkedin: "https://linkedin.com/in/nikhil-pravin-pise",
+      github: "https://github.com/nikhilpravinpise",
+    };
+    if (map[target]) { line(`<span class="out-dim">opening ${target}...</span>`); window.open(map[target], "_blank"); }
+    else line(`<span class="out-dim">usage: open [portfolio|linkedin|github]</span>`);
+    return;
+  }
+  if (COMMANDS[key]) { COMMANDS[key](args); }
+  else line(`<span class="out-dim">command not found: ${escapeHtml(cmd)} — type 'help'</span>`);
+}
+
+function escapeHtml(s) {
+  return s.replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
+}
+
+input.addEventListener("keydown", (e) => {
+  if (e.key === "Enter") {
+    const val = input.value;
+    input.value = "";
+    runCommand(val);
+  }
+});
+document.addEventListener("click", () => input.focus());
+
+/* ---------------------------------------------------------------------- */
+let matrixOn = false;
+function toggleMatrix() {
+  matrixOn = !matrixOn;
+  const canvas = document.getElementById("matrixCanvas");
+  canvas.style.display = matrixOn ? "block" : "none";
+  if (matrixOn) startMatrix();
+}
+function startMatrix() {
+  const canvas = document.getElementById("matrixCanvas");
+  const ctx = canvas.getContext && canvas.getContext("2d");
+  if (!ctx) return; // canvas 2d not available in this environment -- skip quietly
+  canvas.width = window.innerWidth;
+  canvas.height = window.innerHeight;
+  const cols = Math.floor(canvas.width / 14);
+  const drops = new Array(cols).fill(0);
+  const chars = "01アビヴァシシュタ<>/{}[]#*";
+  function draw() {
+    if (!matrixOn) return;
+    ctx.fillStyle = "rgba(13,17,23,0.12)";
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
+    ctx.fillStyle = "#39d353";
+    ctx.font = "13px monospace";
+    drops.forEach((y, i) => {
+      const ch = chars[Math.floor(Math.random() * chars.length)];
+      ctx.fillText(ch, i * 14, y * 14);
+      drops[i] = y * 14 > canvas.height && Math.random() > 0.975 ? 0 : y + 1;
+    });
+    requestAnimationFrame(draw);
+  }
+  draw();
+}
+
+/* ---------------------------------------------------------------------- */
+function boot() {
+  line(`<span class="out-green">connected to github.com/nikhilpravinpise</span>`);
+  line(`<span class="out-dim">type 'help' to see available commands</span>`);
+  blank();
+
+  const statsWrap = document.createElement("div");
+  statsWrap.className = "line";
+  statsWrap.innerHTML = `<div class="stats" id="statsBox"></div>`;
+  term.appendChild(statsWrap);
+
+  blank();
+  runCommand("whoami");
+  input.focus();
+}
+
+loadData();
+boot();
+</script>
+</body>
+</html>
