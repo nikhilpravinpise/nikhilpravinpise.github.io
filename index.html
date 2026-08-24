@@ -362,6 +362,7 @@ const COMMANDS = {
   },
   clear() {
     term.innerHTML = "";
+    printHome();
   },
   banner() {
     line(`<pre style="color:var(--green);margin:0;font-size:9px;">${BANNER}</pre>`);
@@ -441,7 +442,7 @@ function startMatrix() {
 }
 
 /* ---------------------------------------------------------------------- */
-function boot() {
+function printHome() {
   line(`<span class="out-green">connected to github.com/nikhilpravinpise</span>`);
   line(`<span class="out-dim">type 'help' to see available commands</span>`);
   blank();
@@ -450,8 +451,13 @@ function boot() {
   statsWrap.className = "line";
   statsWrap.innerHTML = `<div class="stats" id="statsBox"></div>`;
   term.appendChild(statsWrap);
+  renderStats();
 
   blank();
+}
+
+function boot() {
+  printHome();
   runCommand("whoami");
   input.focus();
 }
