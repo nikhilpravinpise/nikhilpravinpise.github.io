@@ -34,7 +34,9 @@
   .dot{width:11px;height:11px;border-radius:50%;}
   .titlebar .label{position:absolute;left:0;right:0;text-align:center;color:var(--muted);font-size:12px;}
 
-  .term{padding:16px;min-height:360px;max-height:60vh;overflow-y:auto;font-size:13.5px;line-height:1.55;}
+  .term{padding:16px;min-height:360px;max-height:60vh;overflow-y:auto;font-size:13.5px;line-height:1.55;
+    scrollbar-width:none;-ms-overflow-style:none;}
+  .term::-webkit-scrollbar{display:none;}
   .term .line{white-space:pre-wrap;word-break:break-word;}
   .term .prompt-line{display:flex;gap:8px;}
   .term .prompt-tag{color:var(--green);flex-shrink:0;}
