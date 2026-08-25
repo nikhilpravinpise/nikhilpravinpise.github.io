@@ -36,6 +36,7 @@ async function main() {
       "Content-Type": "application/json",
     },
     body: JSON.stringify({ query: QUERY, variables: { login: USERNAME } }),
+    signal: AbortSignal.timeout(30_000), // never hang the CI job on a stalled request
   });
 
   if (!res.ok) {
@@ -88,10 +89,11 @@ async function main() {
     current = { length: len, start, end: days[lastActiveIdx].date };
   }
 
-  const bestDay = days.reduce(
-    (best, d) => (d.count > best.count ? d : best),
+  const best = days.reduce(
+    (b, d) => (d.count > b.count ? d : b),
     { date: days[0]?.date ?? null, count: 0 }
   );
+  const bestDay = best.count > 0 ? best : { date: null, count: 0 };
 
   const monthlyMap = new Map();
   days.forEach((d) => {
@@ -118,8 +120,23 @@ async function main() {
 
   const fs = await import("node:fs");
   fs.mkdirSync("data", { recursive: true });
-  fs.writeFileSync("data/contributions.json", JSON.stringify(output));
+  fs.writeFileSync("data/contributions.json", JSON.stringify(output) + "\n");
   console.log(`Wrote data/contributions.json (${output.total_contributions} contributions, ${days.length} days)`);
+
+  // Keep the offline fallback baked into index.html in sync with the live data.
+  const INDEX_PATH = "index.html";
+  const html = fs.readFileSync(INDEX_PATH, "utf8");
+  const FALLBACK_RE = /window\.__FALLBACK_DATA = [^\r\n]*/;
+  if (FALLBACK_RE.test(html)) {
+    const updated = html.replace(
+      FALLBACK_RE,
+      () => `window.__FALLBACK_DATA = ${JSON.stringify(output)};`
+    );
+    fs.writeFileSync(INDEX_PATH, updated);
+    console.log("Refreshed __FALLBACK_DATA snapshot in index.html");
+  } else {
+    console.warn("WARNING: __FALLBACK_DATA not found in index.html; fallback not refreshed");
+  }
 }
 
 main().catch((err) => {

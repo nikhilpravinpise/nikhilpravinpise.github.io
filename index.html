@@ -4,17 +4,24 @@
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>nikhil@github ~ interactive terminal</title>
-<meta name="description" content="Nikhil Pravin Pise — interactive terminal-style GitHub profile with live contribution stats." />
+<meta name="description" content="Nikhil Pravin Pise - interactive terminal-style GitHub profile with live contribution stats." />
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Crect width='16' height='16' rx='3' fill='%230d1117'/%3E%3Ctext x='2' y='12' font-family='monospace' font-size='10' fill='%2339d353'%3E%3E_%3C/text%3E%3C/svg%3E" />
+<meta property="og:title" content="nikhil@github ~ interactive terminal" />
+<meta property="og:description" content="Nikhil Pravin Pise - interactive terminal-style GitHub profile with live contribution stats." />
+<meta property="og:url" content="https://nikhilpravinpise.github.io/" />
+<meta property="og:image" content="https://github.com/nikhilpravinpise.png" />
+<meta name="twitter:card" content="summary" />
 <style>
   :root{
     --bg:#0d1117; --bg2:#161b22; --frame:#30363d; --muted:#8b949e;
-    --green:#39d353; --green-dim:#146c37; --cyan:#58a6ff; --white:#e6edf3;
-    --red:#ff5f56; --yellow:#ffbd2e;
+    --green:#39d353; --cyan:#58a6ff; --white:#e6edf3;
+    --red:#ff5f56; --yellow:#ffbd2e; --green-dot:#27c93f;
   }
   *{box-sizing:border-box;}
-  html,body{margin:0;padding:0;background:var(--bg);color:var(--white);
+  html{margin:0;padding:0;background:var(--bg);color:var(--white);
     font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;}
-  body{min-height:100vh;display:flex;flex-direction:column;align-items:center;
+  body{margin:0;padding:0;background:transparent;color:var(--white);
+    min-height:100vh;display:flex;flex-direction:column;align-items:center;
     padding:24px 14px 60px;}
   a{color:var(--cyan);text-decoration:none;}
   a:hover{text-decoration:underline;}
@@ -25,7 +32,6 @@
   .hero pre{font-size:clamp(10px,1.6vw,13px);line-height:1.3;color:var(--green);
     margin:0 0 6px;white-space:pre;overflow-x:auto;}
   .hero .tagline{color:var(--muted);font-size:14px;}
-  .hero img{width:min(260px,60vw);border-radius:10px;border:1px solid var(--frame);margin-top:14px;}
 
   .window{background:var(--bg);border:1px solid var(--frame);border-radius:10px;
     overflow:hidden;box-shadow:0 20px 60px -20px rgba(0,0,0,.6);}
@@ -84,6 +90,11 @@
   @media (max-width:520px){
     .term{font-size:12.5px;}
     .hero pre{font-size:10px;}
+    #cmdInput{font-size:16px;} /* >=16px prevents iOS Safari auto-zoom on focus */
+  }
+  @media (prefers-reduced-motion: reduce){
+    .cursor{animation:none;}
+    .cell{transition:none;}
   }
 </style>
 </head>
@@ -100,13 +111,13 @@
     <div class="titlebar">
       <div class="dot" style="background:var(--red)"></div>
       <div class="dot" style="background:var(--yellow)"></div>
-      <div class="dot" style="background:#27c93f"></div>
+      <div class="dot" style="background:var(--green-dot)"></div>
       <div class="label">nikhil@github: ~</div>
     </div>
     <div class="term" id="term"></div>
     <div class="inputRow">
       <span class="prompt-tag">nikhil@github:~$</span>
-      <input id="cmdInput" autocomplete="off" autocapitalize="off" spellcheck="false" />
+      <input id="cmdInput" aria-label="terminal command input" autocomplete="off" autocapitalize="off" spellcheck="false" />
       <span class="cursor" id="fakeCursor"></span>
     </div>
   </div>
@@ -134,7 +145,7 @@
    raw.githubusercontent.com fails -- offline, CORS hiccup, whatever -- the
    page still works and shows real numbers as of the last sync.
    ========================================================================= */
-window.__FALLBACK_DATA = {"username":"nikhilpravinpise","generated_at":"2026-08-24T11:15:53.361Z","range":{"start":"2025-08-24","end":"2026-08-24"},"total_contributions":954,"active_days":172,"avg_per_active_day":5.5,"current_streak":{"length":2,"start":"2026-08-23","end":"2026-08-24"},"longest_streak":{"length":10,"start":"2025-11-16","end":"2025-11-25"},"best_day":{"date":"2026-08-17","count":40},"monthly":[{"month":"2025-08","total":17},{"month":"2025-09","total":40},{"month":"2025-10","total":56},{"month":"2025-11","total":128},{"month":"2025-12","total":116},{"month":"2026-01","total":37},{"month":"2026-02","total":62},{"month":"2026-03","total":30},{"month":"2026-04","total":118},{"month":"2026-05","total":49},{"month":"2026-06","total":76},{"month":"2026-07","total":68},{"month":"2026-08","total":157}],"days":[{"date":"2025-08-24","count":0},{"date":"2025-08-25","count":4},{"date":"2025-08-26","count":1},{"date":"2025-08-27","count":1},{"date":"2025-08-28","count":0},{"date":"2025-08-29","count":0},{"date":"2025-08-30","count":5},{"date":"2025-08-31","count":6},{"date":"2025-09-01","count":0},{"date":"2025-09-02","count":1},{"date":"2025-09-03","count":4},{"date":"2025-09-04","count":0},{"date":"2025-09-05","count":0},{"date":"2025-09-06","count":0},{"date":"2025-09-07","count":0},{"date":"2025-09-08","count":0},{"date":"2025-09-09","count":0},{"date":"2025-09-10","count":4},{"date":"2025-09-11","count":0},{"date":"2025-09-12","count":2},{"date":"2025-09-13","count":15},{"date":"2025-09-14","count":3},{"date":"2025-09-15","count":3},{"date":"2025-09-16","count":0},{"date":"2025-09-17","count":0},{"date":"2025-09-18","count":0},{"date":"2025-09-19","count":0},{"date":"2025-09-20","count":0},{"date":"2025-09-21","count":0},{"date":"2025-09-22","count":0},{"date":"2025-09-23","count":3},{"date":"2025-09-24","count":0},{"date":"2025-09-25","count":0},{"date":"2025-09-26","count":4},{"date":"2025-09-27","count":1},{"date":"2025-09-28","count":0},{"date":"2025-09-29","count":0},{"date":"2025-09-30","count":0},{"date":"2025-10-01","count":0},{"date":"2025-10-02","count":0},{"date":"2025-10-03","count":1},{"date":"2025-10-04","count":8},{"date":"2025-10-05","count":0},{"date":"2025-10-06","count":0},{"date":"2025-10-07","count":0},{"date":"2025-10-08","count":5},{"date":"2025-10-09","count":0},{"date":"2025-10-10","count":0},{"date":"2025-10-11","count":0},{"date":"2025-10-12","count":8},{"date":"2025-10-13","count":0},{"date":"2025-10-14","count":0},{"date":"2025-10-15","count":0},{"date":"2025-10-16","count":0},{"date":"2025-10-17","count":0},{"date":"2025-10-18","count":0},{"date":"2025-10-19","count":0},{"date":"2025-10-20","count":0},{"date":"2025-10-21","count":0},{"date":"2025-10-22","count":0},{"date":"2025-10-23","count":0},{"date":"2025-10-24","count":0},{"date":"2025-10-25","count":0},{"date":"2025-10-26","count":4},{"date":"2025-10-27","count":0},{"date":"2025-10-28","count":0},{"date":"2025-10-29","count":2},{"date":"2025-10-30","count":0},{"date":"2025-10-31","count":28},{"date":"2025-11-01","count":4},{"date":"2025-11-02","count":20},{"date":"2025-11-03","count":0},{"date":"2025-11-04","count":0},{"date":"2025-11-05","count":5},{"date":"2025-11-06","count":5},{"date":"2025-11-07","count":0},{"date":"2025-11-08","count":1},{"date":"2025-11-09","count":13},{"date":"2025-11-10","count":0},{"date":"2025-11-11","count":0},{"date":"2025-11-12","count":0},{"date":"2025-11-13","count":0},{"date":"2025-11-14","count":0},{"date":"2025-11-15","count":0},{"date":"2025-11-16","count":5},{"date":"2025-11-17","count":3},{"date":"2025-11-18","count":13},{"date":"2025-11-19","count":16},{"date":"2025-11-20","count":3},{"date":"2025-11-21","count":5},{"date":"2025-11-22","count":15},{"date":"2025-11-23","count":2},{"date":"2025-11-24","count":1},{"date":"2025-11-25","count":2},{"date":"2025-11-26","count":0},{"date":"2025-11-27","count":1},{"date":"2025-11-28","count":4},{"date":"2025-11-29","count":6},{"date":"2025-11-30","count":4},{"date":"2025-12-01","count":0},{"date":"2025-12-02","count":6},{"date":"2025-12-03","count":5},{"date":"2025-12-04","count":0},{"date":"2025-12-05","count":0},{"date":"2025-12-06","count":0},{"date":"2025-12-07","count":6},{"date":"2025-12-08","count":1},{"date":"2025-12-09","count":1},{"date":"2025-12-10","count":11},{"date":"2025-12-11","count":6},{"date":"2025-12-12","count":0},{"date":"2025-12-13","count":1},{"date":"2025-12-14","count":0},{"date":"2025-12-15","count":26},{"date":"2025-12-16","count":0},{"date":"2025-12-17","count":3},{"date":"2025-12-18","count":0},{"date":"2025-12-19","count":7},{"date":"2025-12-20","count":0},{"date":"2025-12-21","count":0},{"date":"2025-12-22","count":1},{"date":"2025-12-23","count":0},{"date":"2025-12-24","count":11},{"date":"2025-12-25","count":3},{"date":"2025-12-26","count":2},{"date":"2025-12-27","count":9},{"date":"2025-12-28","count":2},{"date":"2025-12-29","count":1},{"date":"2025-12-30","count":0},{"date":"2025-12-31","count":14},{"date":"2026-01-01","count":0},{"date":"2026-01-02","count":2},{"date":"2026-01-03","count":1},{"date":"2026-01-04","count":0},{"date":"2026-01-05","count":5},{"date":"2026-01-06","count":2},{"date":"2026-01-07","count":2},{"date":"2026-01-08","count":0},{"date":"2026-01-09","count":0},{"date":"2026-01-10","count":0},{"date":"2026-01-11","count":0},{"date":"2026-01-12","count":0},{"date":"2026-01-13","count":2},{"date":"2026-01-14","count":0},{"date":"2026-01-15","count":2},{"date":"2026-01-16","count":0},{"date":"2026-01-17","count":0},{"date":"2026-01-18","count":0},{"date":"2026-01-19","count":0},{"date":"2026-01-20","count":3},{"date":"2026-01-21","count":12},{"date":"2026-01-22","count":2},{"date":"2026-01-23","count":2},{"date":"2026-01-24","count":0},{"date":"2026-01-25","count":1},{"date":"2026-01-26","count":1},{"date":"2026-01-27","count":0},{"date":"2026-01-28","count":0},{"date":"2026-01-29","count":0},{"date":"2026-01-30","count":0},{"date":"2026-01-31","count":0},{"date":"2026-02-01","count":1},{"date":"2026-02-02","count":7},{"date":"2026-02-03","count":14},{"date":"2026-02-04","count":0},{"date":"2026-02-05","count":0},{"date":"2026-02-06","count":4},{"date":"2026-02-07","count":4},{"date":"2026-02-08","count":5},{"date":"2026-02-09","count":0},{"date":"2026-02-10","count":0},{"date":"2026-02-11","count":0},{"date":"2026-02-12","count":0},{"date":"2026-02-13","count":0},{"date":"2026-02-14","count":0},{"date":"2026-02-15","count":3},{"date":"2026-02-16","count":2},{"date":"2026-02-17","count":2},{"date":"2026-02-18","count":0},{"date":"2026-02-19","count":0},{"date":"2026-02-20","count":0},{"date":"2026-02-21","count":0},{"date":"2026-02-22","count":0},{"date":"2026-02-23","count":13},{"date":"2026-02-24","count":3},{"date":"2026-02-25","count":3},{"date":"2026-02-26","count":0},{"date":"2026-02-27","count":1},{"date":"2026-02-28","count":0},{"date":"2026-03-01","count":0},{"date":"2026-03-02","count":0},{"date":"2026-03-03","count":0},{"date":"2026-03-04","count":0},{"date":"2026-03-05","count":0},{"date":"2026-03-06","count":0},{"date":"2026-03-07","count":0},{"date":"2026-03-08","count":0},{"date":"2026-03-09","count":15},{"date":"2026-03-10","count":2},{"date":"2026-03-11","count":0},{"date":"2026-03-12","count":0},{"date":"2026-03-13","count":7},{"date":"2026-03-14","count":5},{"date":"2026-03-15","count":0},{"date":"2026-03-16","count":0},{"date":"2026-03-17","count":0},{"date":"2026-03-18","count":0},{"date":"2026-03-19","count":0},{"date":"2026-03-20","count":0},{"date":"2026-03-21","count":0},{"date":"2026-03-22","count":0},{"date":"2026-03-23","count":0},{"date":"2026-03-24","count":0},{"date":"2026-03-25","count":0},{"date":"2026-03-26","count":0},{"date":"2026-03-27","count":0},{"date":"2026-03-28","count":0},{"date":"2026-03-29","count":0},{"date":"2026-03-30","count":0},{"date":"2026-03-31","count":1},{"date":"2026-04-01","count":2},{"date":"2026-04-02","count":0},{"date":"2026-04-03","count":2},{"date":"2026-04-04","count":5},{"date":"2026-04-05","count":15},{"date":"2026-04-06","count":6},{"date":"2026-04-07","count":8},{"date":"2026-04-08","count":2},{"date":"2026-04-09","count":13},{"date":"2026-04-10","count":0},{"date":"2026-04-11","count":2},{"date":"2026-04-12","count":0},{"date":"2026-04-13","count":0},{"date":"2026-04-14","count":0},{"date":"2026-04-15","count":0},{"date":"2026-04-16","count":0},{"date":"2026-04-17","count":15},{"date":"2026-04-18","count":2},{"date":"2026-04-19","count":4},{"date":"2026-04-20","count":0},{"date":"2026-04-21","count":20},{"date":"2026-04-22","count":2},{"date":"2026-04-23","count":2},{"date":"2026-04-24","count":1},{"date":"2026-04-25","count":11},{"date":"2026-04-26","count":5},{"date":"2026-04-27","count":0},{"date":"2026-04-28","count":0},{"date":"2026-04-29","count":0},{"date":"2026-04-30","count":1},{"date":"2026-05-01","count":0},{"date":"2026-05-02","count":1},{"date":"2026-05-03","count":10},{"date":"2026-05-04","count":0},{"date":"2026-05-05","count":10},{"date":"2026-05-06","count":3},{"date":"2026-05-07","count":0},{"date":"2026-05-08","count":2},{"date":"2026-05-09","count":3},{"date":"2026-05-10","count":2},{"date":"2026-05-11","count":7},{"date":"2026-05-12","count":0},{"date":"2026-05-13","count":0},{"date":"2026-05-14","count":3},{"date":"2026-05-15","count":0},{"date":"2026-05-16","count":0},{"date":"2026-05-17","count":0},{"date":"2026-05-18","count":0},{"date":"2026-05-19","count":0},{"date":"2026-05-20","count":0},{"date":"2026-05-21","count":0},{"date":"2026-05-22","count":0},{"date":"2026-05-23","count":0},{"date":"2026-05-24","count":0},{"date":"2026-05-25","count":0},{"date":"2026-05-26","count":0},{"date":"2026-05-27","count":7},{"date":"2026-05-28","count":1},{"date":"2026-05-29","count":0},{"date":"2026-05-30","count":0},{"date":"2026-05-31","count":0},{"date":"2026-06-01","count":0},{"date":"2026-06-02","count":0},{"date":"2026-06-03","count":0},{"date":"2026-06-04","count":1},{"date":"2026-06-05","count":0},{"date":"2026-06-06","count":0},{"date":"2026-06-07","count":1},{"date":"2026-06-08","count":0},{"date":"2026-06-09","count":0},{"date":"2026-06-10","count":0},{"date":"2026-06-11","count":16},{"date":"2026-06-12","count":4},{"date":"2026-06-13","count":11},{"date":"2026-06-14","count":17},{"date":"2026-06-15","count":5},{"date":"2026-06-16","count":0},{"date":"2026-06-17","count":2},{"date":"2026-06-18","count":3},{"date":"2026-06-19","count":0},{"date":"2026-06-20","count":0},{"date":"2026-06-21","count":0},{"date":"2026-06-22","count":2},{"date":"2026-06-23","count":0},{"date":"2026-06-24","count":3},{"date":"2026-06-25","count":0},{"date":"2026-06-26","count":2},{"date":"2026-06-27","count":1},{"date":"2026-06-28","count":1},{"date":"2026-06-29","count":1},{"date":"2026-06-30","count":6},{"date":"2026-07-01","count":0},{"date":"2026-07-02","count":0},{"date":"2026-07-03","count":0},{"date":"2026-07-04","count":0},{"date":"2026-07-05","count":0},{"date":"2026-07-06","count":1},{"date":"2026-07-07","count":0},{"date":"2026-07-08","count":0},{"date":"2026-07-09","count":0},{"date":"2026-07-10","count":2},{"date":"2026-07-11","count":4},{"date":"2026-07-12","count":0},{"date":"2026-07-13","count":0},{"date":"2026-07-14","count":0},{"date":"2026-07-15","count":1},{"date":"2026-07-16","count":3},{"date":"2026-07-17","count":5},{"date":"2026-07-18","count":0},{"date":"2026-07-19","count":3},{"date":"2026-07-20","count":1},{"date":"2026-07-21","count":2},{"date":"2026-07-22","count":1},{"date":"2026-07-23","count":9},{"date":"2026-07-24","count":0},{"date":"2026-07-25","count":18},{"date":"2026-07-26","count":2},{"date":"2026-07-27","count":0},{"date":"2026-07-28","count":1},{"date":"2026-07-29","count":10},{"date":"2026-07-30","count":2},{"date":"2026-07-31","count":3},{"date":"2026-08-01","count":0},{"date":"2026-08-02","count":5},{"date":"2026-08-03","count":4},{"date":"2026-08-04","count":1},{"date":"2026-08-05","count":0},{"date":"2026-08-06","count":0},{"date":"2026-08-07","count":3},{"date":"2026-08-08","count":8},{"date":"2026-08-09","count":0},{"date":"2026-08-10","count":3},{"date":"2026-08-11","count":4},{"date":"2026-08-12","count":1},{"date":"2026-08-13","count":3},{"date":"2026-08-14","count":0},{"date":"2026-08-15","count":10},{"date":"2026-08-16","count":39},{"date":"2026-08-17","count":40},{"date":"2026-08-18","count":16},{"date":"2026-08-19","count":0},{"date":"2026-08-20","count":2},{"date":"2026-08-21","count":2},{"date":"2026-08-22","count":0},{"date":"2026-08-23","count":2},{"date":"2026-08-24","count":14}]};
+window.__FALLBACK_DATA = {"username":"nikhilpravinpise","generated_at":"2026-08-25T03:59:34.934Z","range":{"start":"2025-08-24","end":"2026-08-25"},"total_contributions":968,"active_days":173,"avg_per_active_day":5.6,"current_streak":{"length":3,"start":"2026-08-23","end":"2026-08-25"},"longest_streak":{"length":10,"start":"2025-11-16","end":"2025-11-25"},"best_day":{"date":"2026-08-17","count":40},"monthly":[{"month":"2025-08","total":17},{"month":"2025-09","total":40},{"month":"2025-10","total":56},{"month":"2025-11","total":128},{"month":"2025-12","total":116},{"month":"2026-01","total":37},{"month":"2026-02","total":62},{"month":"2026-03","total":30},{"month":"2026-04","total":118},{"month":"2026-05","total":49},{"month":"2026-06","total":76},{"month":"2026-07","total":68},{"month":"2026-08","total":171}],"days":[{"date":"2025-08-24","count":0},{"date":"2025-08-25","count":4},{"date":"2025-08-26","count":1},{"date":"2025-08-27","count":1},{"date":"2025-08-28","count":0},{"date":"2025-08-29","count":0},{"date":"2025-08-30","count":5},{"date":"2025-08-31","count":6},{"date":"2025-09-01","count":0},{"date":"2025-09-02","count":1},{"date":"2025-09-03","count":4},{"date":"2025-09-04","count":0},{"date":"2025-09-05","count":0},{"date":"2025-09-06","count":0},{"date":"2025-09-07","count":0},{"date":"2025-09-08","count":0},{"date":"2025-09-09","count":0},{"date":"2025-09-10","count":4},{"date":"2025-09-11","count":0},{"date":"2025-09-12","count":2},{"date":"2025-09-13","count":15},{"date":"2025-09-14","count":3},{"date":"2025-09-15","count":3},{"date":"2025-09-16","count":0},{"date":"2025-09-17","count":0},{"date":"2025-09-18","count":0},{"date":"2025-09-19","count":0},{"date":"2025-09-20","count":0},{"date":"2025-09-21","count":0},{"date":"2025-09-22","count":0},{"date":"2025-09-23","count":3},{"date":"2025-09-24","count":0},{"date":"2025-09-25","count":0},{"date":"2025-09-26","count":4},{"date":"2025-09-27","count":1},{"date":"2025-09-28","count":0},{"date":"2025-09-29","count":0},{"date":"2025-09-30","count":0},{"date":"2025-10-01","count":0},{"date":"2025-10-02","count":0},{"date":"2025-10-03","count":1},{"date":"2025-10-04","count":8},{"date":"2025-10-05","count":0},{"date":"2025-10-06","count":0},{"date":"2025-10-07","count":0},{"date":"2025-10-08","count":5},{"date":"2025-10-09","count":0},{"date":"2025-10-10","count":0},{"date":"2025-10-11","count":0},{"date":"2025-10-12","count":8},{"date":"2025-10-13","count":0},{"date":"2025-10-14","count":0},{"date":"2025-10-15","count":0},{"date":"2025-10-16","count":0},{"date":"2025-10-17","count":0},{"date":"2025-10-18","count":0},{"date":"2025-10-19","count":0},{"date":"2025-10-20","count":0},{"date":"2025-10-21","count":0},{"date":"2025-10-22","count":0},{"date":"2025-10-23","count":0},{"date":"2025-10-24","count":0},{"date":"2025-10-25","count":0},{"date":"2025-10-26","count":4},{"date":"2025-10-27","count":0},{"date":"2025-10-28","count":0},{"date":"2025-10-29","count":2},{"date":"2025-10-30","count":0},{"date":"2025-10-31","count":28},{"date":"2025-11-01","count":4},{"date":"2025-11-02","count":20},{"date":"2025-11-03","count":0},{"date":"2025-11-04","count":0},{"date":"2025-11-05","count":5},{"date":"2025-11-06","count":5},{"date":"2025-11-07","count":0},{"date":"2025-11-08","count":1},{"date":"2025-11-09","count":13},{"date":"2025-11-10","count":0},{"date":"2025-11-11","count":0},{"date":"2025-11-12","count":0},{"date":"2025-11-13","count":0},{"date":"2025-11-14","count":0},{"date":"2025-11-15","count":0},{"date":"2025-11-16","count":5},{"date":"2025-11-17","count":3},{"date":"2025-11-18","count":13},{"date":"2025-11-19","count":16},{"date":"2025-11-20","count":3},{"date":"2025-11-21","count":5},{"date":"2025-11-22","count":15},{"date":"2025-11-23","count":2},{"date":"2025-11-24","count":1},{"date":"2025-11-25","count":2},{"date":"2025-11-26","count":0},{"date":"2025-11-27","count":1},{"date":"2025-11-28","count":4},{"date":"2025-11-29","count":6},{"date":"2025-11-30","count":4},{"date":"2025-12-01","count":0},{"date":"2025-12-02","count":6},{"date":"2025-12-03","count":5},{"date":"2025-12-04","count":0},{"date":"2025-12-05","count":0},{"date":"2025-12-06","count":0},{"date":"2025-12-07","count":6},{"date":"2025-12-08","count":1},{"date":"2025-12-09","count":1},{"date":"2025-12-10","count":11},{"date":"2025-12-11","count":6},{"date":"2025-12-12","count":0},{"date":"2025-12-13","count":1},{"date":"2025-12-14","count":0},{"date":"2025-12-15","count":26},{"date":"2025-12-16","count":0},{"date":"2025-12-17","count":3},{"date":"2025-12-18","count":0},{"date":"2025-12-19","count":7},{"date":"2025-12-20","count":0},{"date":"2025-12-21","count":0},{"date":"2025-12-22","count":1},{"date":"2025-12-23","count":0},{"date":"2025-12-24","count":11},{"date":"2025-12-25","count":3},{"date":"2025-12-26","count":2},{"date":"2025-12-27","count":9},{"date":"2025-12-28","count":2},{"date":"2025-12-29","count":1},{"date":"2025-12-30","count":0},{"date":"2025-12-31","count":14},{"date":"2026-01-01","count":0},{"date":"2026-01-02","count":2},{"date":"2026-01-03","count":1},{"date":"2026-01-04","count":0},{"date":"2026-01-05","count":5},{"date":"2026-01-06","count":2},{"date":"2026-01-07","count":2},{"date":"2026-01-08","count":0},{"date":"2026-01-09","count":0},{"date":"2026-01-10","count":0},{"date":"2026-01-11","count":0},{"date":"2026-01-12","count":0},{"date":"2026-01-13","count":2},{"date":"2026-01-14","count":0},{"date":"2026-01-15","count":2},{"date":"2026-01-16","count":0},{"date":"2026-01-17","count":0},{"date":"2026-01-18","count":0},{"date":"2026-01-19","count":0},{"date":"2026-01-20","count":3},{"date":"2026-01-21","count":12},{"date":"2026-01-22","count":2},{"date":"2026-01-23","count":2},{"date":"2026-01-24","count":0},{"date":"2026-01-25","count":1},{"date":"2026-01-26","count":1},{"date":"2026-01-27","count":0},{"date":"2026-01-28","count":0},{"date":"2026-01-29","count":0},{"date":"2026-01-30","count":0},{"date":"2026-01-31","count":0},{"date":"2026-02-01","count":1},{"date":"2026-02-02","count":7},{"date":"2026-02-03","count":14},{"date":"2026-02-04","count":0},{"date":"2026-02-05","count":0},{"date":"2026-02-06","count":4},{"date":"2026-02-07","count":4},{"date":"2026-02-08","count":5},{"date":"2026-02-09","count":0},{"date":"2026-02-10","count":0},{"date":"2026-02-11","count":0},{"date":"2026-02-12","count":0},{"date":"2026-02-13","count":0},{"date":"2026-02-14","count":0},{"date":"2026-02-15","count":3},{"date":"2026-02-16","count":2},{"date":"2026-02-17","count":2},{"date":"2026-02-18","count":0},{"date":"2026-02-19","count":0},{"date":"2026-02-20","count":0},{"date":"2026-02-21","count":0},{"date":"2026-02-22","count":0},{"date":"2026-02-23","count":13},{"date":"2026-02-24","count":3},{"date":"2026-02-25","count":3},{"date":"2026-02-26","count":0},{"date":"2026-02-27","count":1},{"date":"2026-02-28","count":0},{"date":"2026-03-01","count":0},{"date":"2026-03-02","count":0},{"date":"2026-03-03","count":0},{"date":"2026-03-04","count":0},{"date":"2026-03-05","count":0},{"date":"2026-03-06","count":0},{"date":"2026-03-07","count":0},{"date":"2026-03-08","count":0},{"date":"2026-03-09","count":15},{"date":"2026-03-10","count":2},{"date":"2026-03-11","count":0},{"date":"2026-03-12","count":0},{"date":"2026-03-13","count":7},{"date":"2026-03-14","count":5},{"date":"2026-03-15","count":0},{"date":"2026-03-16","count":0},{"date":"2026-03-17","count":0},{"date":"2026-03-18","count":0},{"date":"2026-03-19","count":0},{"date":"2026-03-20","count":0},{"date":"2026-03-21","count":0},{"date":"2026-03-22","count":0},{"date":"2026-03-23","count":0},{"date":"2026-03-24","count":0},{"date":"2026-03-25","count":0},{"date":"2026-03-26","count":0},{"date":"2026-03-27","count":0},{"date":"2026-03-28","count":0},{"date":"2026-03-29","count":0},{"date":"2026-03-30","count":0},{"date":"2026-03-31","count":1},{"date":"2026-04-01","count":2},{"date":"2026-04-02","count":0},{"date":"2026-04-03","count":2},{"date":"2026-04-04","count":5},{"date":"2026-04-05","count":15},{"date":"2026-04-06","count":6},{"date":"2026-04-07","count":8},{"date":"2026-04-08","count":2},{"date":"2026-04-09","count":13},{"date":"2026-04-10","count":0},{"date":"2026-04-11","count":2},{"date":"2026-04-12","count":0},{"date":"2026-04-13","count":0},{"date":"2026-04-14","count":0},{"date":"2026-04-15","count":0},{"date":"2026-04-16","count":0},{"date":"2026-04-17","count":15},{"date":"2026-04-18","count":2},{"date":"2026-04-19","count":4},{"date":"2026-04-20","count":0},{"date":"2026-04-21","count":20},{"date":"2026-04-22","count":2},{"date":"2026-04-23","count":2},{"date":"2026-04-24","count":1},{"date":"2026-04-25","count":11},{"date":"2026-04-26","count":5},{"date":"2026-04-27","count":0},{"date":"2026-04-28","count":0},{"date":"2026-04-29","count":0},{"date":"2026-04-30","count":1},{"date":"2026-05-01","count":0},{"date":"2026-05-02","count":1},{"date":"2026-05-03","count":10},{"date":"2026-05-04","count":0},{"date":"2026-05-05","count":10},{"date":"2026-05-06","count":3},{"date":"2026-05-07","count":0},{"date":"2026-05-08","count":2},{"date":"2026-05-09","count":3},{"date":"2026-05-10","count":2},{"date":"2026-05-11","count":7},{"date":"2026-05-12","count":0},{"date":"2026-05-13","count":0},{"date":"2026-05-14","count":3},{"date":"2026-05-15","count":0},{"date":"2026-05-16","count":0},{"date":"2026-05-17","count":0},{"date":"2026-05-18","count":0},{"date":"2026-05-19","count":0},{"date":"2026-05-20","count":0},{"date":"2026-05-21","count":0},{"date":"2026-05-22","count":0},{"date":"2026-05-23","count":0},{"date":"2026-05-24","count":0},{"date":"2026-05-25","count":0},{"date":"2026-05-26","count":0},{"date":"2026-05-27","count":7},{"date":"2026-05-28","count":1},{"date":"2026-05-29","count":0},{"date":"2026-05-30","count":0},{"date":"2026-05-31","count":0},{"date":"2026-06-01","count":0},{"date":"2026-06-02","count":0},{"date":"2026-06-03","count":0},{"date":"2026-06-04","count":1},{"date":"2026-06-05","count":0},{"date":"2026-06-06","count":0},{"date":"2026-06-07","count":1},{"date":"2026-06-08","count":0},{"date":"2026-06-09","count":0},{"date":"2026-06-10","count":0},{"date":"2026-06-11","count":16},{"date":"2026-06-12","count":4},{"date":"2026-06-13","count":11},{"date":"2026-06-14","count":17},{"date":"2026-06-15","count":5},{"date":"2026-06-16","count":0},{"date":"2026-06-17","count":2},{"date":"2026-06-18","count":3},{"date":"2026-06-19","count":0},{"date":"2026-06-20","count":0},{"date":"2026-06-21","count":0},{"date":"2026-06-22","count":2},{"date":"2026-06-23","count":0},{"date":"2026-06-24","count":3},{"date":"2026-06-25","count":0},{"date":"2026-06-26","count":2},{"date":"2026-06-27","count":1},{"date":"2026-06-28","count":1},{"date":"2026-06-29","count":1},{"date":"2026-06-30","count":6},{"date":"2026-07-01","count":0},{"date":"2026-07-02","count":0},{"date":"2026-07-03","count":0},{"date":"2026-07-04","count":0},{"date":"2026-07-05","count":0},{"date":"2026-07-06","count":1},{"date":"2026-07-07","count":0},{"date":"2026-07-08","count":0},{"date":"2026-07-09","count":0},{"date":"2026-07-10","count":2},{"date":"2026-07-11","count":4},{"date":"2026-07-12","count":0},{"date":"2026-07-13","count":0},{"date":"2026-07-14","count":0},{"date":"2026-07-15","count":1},{"date":"2026-07-16","count":3},{"date":"2026-07-17","count":5},{"date":"2026-07-18","count":0},{"date":"2026-07-19","count":3},{"date":"2026-07-20","count":1},{"date":"2026-07-21","count":2},{"date":"2026-07-22","count":1},{"date":"2026-07-23","count":9},{"date":"2026-07-24","count":0},{"date":"2026-07-25","count":18},{"date":"2026-07-26","count":2},{"date":"2026-07-27","count":0},{"date":"2026-07-28","count":1},{"date":"2026-07-29","count":10},{"date":"2026-07-30","count":2},{"date":"2026-07-31","count":3},{"date":"2026-08-01","count":0},{"date":"2026-08-02","count":5},{"date":"2026-08-03","count":4},{"date":"2026-08-04","count":1},{"date":"2026-08-05","count":0},{"date":"2026-08-06","count":0},{"date":"2026-08-07","count":3},{"date":"2026-08-08","count":8},{"date":"2026-08-09","count":0},{"date":"2026-08-10","count":3},{"date":"2026-08-11","count":4},{"date":"2026-08-12","count":1},{"date":"2026-08-13","count":3},{"date":"2026-08-14","count":0},{"date":"2026-08-15","count":10},{"date":"2026-08-16","count":39},{"date":"2026-08-17","count":40},{"date":"2026-08-18","count":16},{"date":"2026-08-19","count":0},{"date":"2026-08-20","count":2},{"date":"2026-08-21","count":2},{"date":"2026-08-22","count":0},{"date":"2026-08-23","count":4},{"date":"2026-08-24","count":21},{"date":"2026-08-25","count":5}]};
 
 const LIVE_DATA_URL = "./data/contributions.json";
 
@@ -175,7 +186,13 @@ async function loadData() {
 }
 
 /* ---------------------------------------------------------------------- */
+const REDUCED_MOTION = window.matchMedia("(prefers-reduced-motion: reduce)");
+
 function countUp(el, target, suffix) {
+  if (REDUCED_MOTION.matches) {
+    el.textContent = target.toLocaleString() + (suffix || "");
+    return;
+  }
   const dur = 900;
   const start = performance.now();
   function tick(now) {
@@ -248,14 +265,28 @@ function buildHeatmapEl() {
         cell.style.cursor = "default";
       } else {
         const lvl = levelFor(d.count);
+        const tip = `${d.date}: ${d.count} contribution${d.count === 1 ? "" : "s"}`;
         cell.style.background = PALETTE[lvl];
-        cell.addEventListener("mousemove", (e) => {
+        cell.setAttribute("role", "img");
+        cell.setAttribute("aria-label", tip);
+        const showTip = (e) => {
+          tooltip.textContent = tip;
           tooltip.style.display = "block";
-          tooltip.style.left = e.clientX + 14 + "px";
-          tooltip.style.top = e.clientY + 14 + "px";
-          tooltip.textContent = `${d.date}: ${d.count} contribution${d.count === 1 ? "" : "s"}`;
+          const x = Math.min(e.clientX + 14, window.innerWidth - tooltip.offsetWidth - 8);
+          const y = Math.min(e.clientY + 14, window.innerHeight - tooltip.offsetHeight - 8);
+          tooltip.style.left = Math.max(0, x) + "px";
+          tooltip.style.top = Math.max(0, y) + "px";
+        };
+        const hideTip = () => { tooltip.style.display = "none"; };
+        let tapTimer = null;
+        cell.addEventListener("pointermove", showTip);
+        cell.addEventListener("pointerdown", showTip);
+        cell.addEventListener("pointerleave", () => { clearTimeout(tapTimer); hideTip(); });
+        cell.addEventListener("pointerup", (e) => {
+          if (e.pointerType === "mouse") return; // mouse keeps hover behavior
+          clearTimeout(tapTimer);
+          tapTimer = setTimeout(hideTip, 1500); // touch: let a tap be readable
         });
-        cell.addEventListener("mouseleave", () => { tooltip.style.display = "none"; });
       }
       grid.appendChild(cell);
     });
@@ -312,10 +343,10 @@ const COMMANDS = {
   },
   projects() {
     [
-      ["Cairn", "Offline FEMA building triage — Gemma 4 (2B) fully on-device via LiteRT-LM", "https://github.com/nikhilpravinpise/Cairn"],
-      ["Project Aether", "GraphQL-first Medium scraper — Apify Actor + MCP server + Gradio UI, 15x faster", "https://github.com/nikhilpravinpise/Medium-Agent"],
-      ["Parmar", "AI outbound sales qualification — Vapi voice agent + Twilio WhatsApp alerts", "https://github.com/nikhilpravinpise/Parmar"],
-      ["ZerveChurn", "SaaS churn prediction — 409K events, PyTorch GraphSAGE, 0.94 ROC-AUC", "https://github.com/nikhilpravinpise/ZerveChurn"],
+      ["Cairn", "Offline FEMA building triage - Gemma 4 (2B) fully on-device via LiteRT-LM", "https://github.com/nikhilpravinpise/Cairn"],
+      ["Project Aether", "GraphQL-first Medium scraper - Apify Actor + MCP server + Gradio UI, 15x faster", "https://github.com/nikhilpravinpise/Medium-Agent"],
+      ["Parmar", "AI outbound sales qualification - Vapi voice agent + Twilio WhatsApp alerts", "https://github.com/nikhilpravinpise/Parmar"],
+      ["ZerveChurn", "SaaS churn prediction - 409K events, PyTorch GraphSAGE, 0.94 ROC-AUC", "https://github.com/nikhilpravinpise/ZerveChurn"],
     ].forEach(([n, d, url]) => {
       line(`<span class="out-cmd">&gt; ${n}</span>`);
       line(`  <span class="out-dim">${d}</span>`);
@@ -345,7 +376,7 @@ const COMMANDS = {
     if (!DATA) { line(`<span class="out-dim">loading contribution data...</span>`); return; }
     line(`<span class="out-green">current streak:</span>  ${DATA.current_streak.length} days (${DATA.current_streak.start} → ${DATA.current_streak.end})`);
     line(`<span class="out-green">longest streak:</span>  ${DATA.longest_streak.length} days (${DATA.longest_streak.start} → ${DATA.longest_streak.end})`);
-    line(`<span class="out-green">best day:</span>       ${DATA.best_day.count} contributions on ${DATA.best_day.date}`);
+    line(`<span class="out-green">best day:</span>       ${DATA.best_day.count} contributions${DATA.best_day.count > 0 ? " on " + DATA.best_day.date : ""}`);
     line(`<span class="out-green">total:</span>          ${DATA.total_contributions.toLocaleString()} contributions since ${DATA.range.start}`);
   },
   contributions() {
@@ -359,6 +390,10 @@ const COMMANDS = {
     line(`<span class="out-dim">hover a cell for the exact date and count</span>`);
   },
   matrix() {
+    if (REDUCED_MOTION.matches) {
+      line(`<span class="out-dim">matrix mode is disabled while reduced motion is on</span>`);
+      return;
+    }
     toggleMatrix();
     line(`<span class="out-dim">${matrixOn ? "matrix mode on -- type 'matrix' again to turn it off" : "back to normal"}</span>`);
   },
@@ -394,7 +429,7 @@ function runCommand(raw) {
     return;
   }
   if (COMMANDS[key]) { COMMANDS[key](args); }
-  else line(`<span class="out-dim">command not found: ${escapeHtml(cmd)} — type 'help'</span>`);
+  else line(`<span class="out-dim">command not found: ${escapeHtml(cmd)} - type 'help'</span>`);
 }
 
 function escapeHtml(s) {
@@ -412,6 +447,7 @@ document.addEventListener("click", () => input.focus());
 
 /* ---------------------------------------------------------------------- */
 let matrixOn = false;
+let matrixLoop = 0;
 function toggleMatrix() {
   matrixOn = !matrixOn;
   const canvas = document.getElementById("matrixCanvas");
@@ -422,13 +458,14 @@ function startMatrix() {
   const canvas = document.getElementById("matrixCanvas");
   const ctx = canvas.getContext && canvas.getContext("2d");
   if (!ctx) return; // canvas 2d not available in this environment -- skip quietly
+  const myLoop = ++matrixLoop; // invalidates any previous draw loop
   canvas.width = window.innerWidth;
   canvas.height = window.innerHeight;
   const cols = Math.floor(canvas.width / 14);
   const drops = new Array(cols).fill(0);
   const chars = "01アビヴァシシュタ<>/{}[]#*";
   function draw() {
-    if (!matrixOn) return;
+    if (!matrixOn || myLoop !== matrixLoop) return;
     ctx.fillStyle = "rgba(13,17,23,0.12)";
     ctx.fillRect(0, 0, canvas.width, canvas.height);
     ctx.fillStyle = "#39d353";
@@ -442,6 +479,7 @@ function startMatrix() {
   }
   draw();
 }
+window.addEventListener("resize", () => { if (matrixOn) startMatrix(); });
 
 /* ---------------------------------------------------------------------- */
 function printHome() {

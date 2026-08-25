@@ -15,19 +15,28 @@ concurrency:
 jobs:
   update:
     runs-on: ubuntu-latest
+    timeout-minutes: 10
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
 
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
       - name: Generate data/contributions.json
         env:
-          CONTRIB_PAT: ${{ secrets.CONTRIB_PAT }}
+          # PAT only needed to count private contributions; the workflow token
+          # is enough for the public contribution calendar.
+          CONTRIB_PAT: ${{ secrets.CONTRIB_PAT || github.token }}
         run: node scripts/generate-contributions.js
 
       - name: Commit and push if changed
         run: |
           git config --local user.email "github-actions[bot]@users.noreply.github.com"
           git config --local user.name "github-actions[bot]"
-          git add data/contributions.json
+          git add data/contributions.json index.html
           git diff --staged --quiet || git commit -m "chore: refresh contribution data"
+          git pull --rebase
           git push
