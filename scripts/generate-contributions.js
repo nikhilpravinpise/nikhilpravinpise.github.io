@@ -48,6 +48,10 @@ async function main() {
     throw new Error(`GitHub GraphQL errors: ${JSON.stringify(json.errors)}`);
   }
 
+  if (!json.data || !json.data.user) {
+    throw new Error("GitHub user data missing or query failed");
+  }
+
   const calendar = json.data.user.contributionsCollection.contributionCalendar;
   const days = calendar.weeks
     .flatMap((w) => w.contributionDays)
@@ -74,12 +78,13 @@ async function main() {
     }
   });
 
-  // current streak = trailing run ending at the last day with count > 0
+  // current streak = trailing run ending at today or yesterday with count > 0
   let lastActiveIdx = -1;
   for (let i = days.length - 1; i >= 0; i--) {
     if (days[i].count > 0) { lastActiveIdx = i; break; }
   }
-  if (lastActiveIdx >= 0) {
+  const daysSinceLastActive = (days.length - 1) - lastActiveIdx;
+  if (lastActiveIdx >= 0 && daysSinceLastActive <= 1) {
     let len = 0;
     let start = days[lastActiveIdx].date;
     for (let i = lastActiveIdx; i >= 0 && days[i].count > 0; i--) {
@@ -87,6 +92,8 @@ async function main() {
       start = days[i].date;
     }
     current = { length: len, start, end: days[lastActiveIdx].date };
+  } else {
+    current = { length: 0, start: null, end: null };
   }
 
   const best = days.reduce(
@@ -128,9 +135,10 @@ async function main() {
   const html = fs.readFileSync(INDEX_PATH, "utf8");
   const FALLBACK_RE = /window\.__FALLBACK_DATA = [^\r\n]*/;
   if (FALLBACK_RE.test(html)) {
+    const safeJson = JSON.stringify(output).replace(/<\/script>/gi, "<\\/script>");
     const updated = html.replace(
       FALLBACK_RE,
-      () => `window.__FALLBACK_DATA = ${JSON.stringify(output)};`
+      () => `window.__FALLBACK_DATA = ${safeJson};`
     );
     fs.writeFileSync(INDEX_PATH, updated);
     console.log("Refreshed __FALLBACK_DATA snapshot in index.html");

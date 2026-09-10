@@ -5,12 +5,18 @@
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>nikhil@github ~ interactive terminal</title>
 <meta name="description" content="Nikhil Pravin Pise - interactive terminal-style GitHub profile with live contribution stats." />
+<meta name="author" content="Nikhil Pravin Pise" />
+<link rel="canonical" href="https://nikhilpravinpise.github.io/" />
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Crect width='16' height='16' rx='3' fill='%230d1117'/%3E%3Ctext x='2' y='12' font-family='monospace' font-size='10' fill='%2339d353'%3E%3E_%3C/text%3E%3C/svg%3E" />
+<meta property="og:type" content="website" />
 <meta property="og:title" content="nikhil@github ~ interactive terminal" />
 <meta property="og:description" content="Nikhil Pravin Pise - interactive terminal-style GitHub profile with live contribution stats." />
 <meta property="og:url" content="https://nikhilpravinpise.github.io/" />
 <meta property="og:image" content="https://github.com/nikhilpravinpise.png" />
 <meta name="twitter:card" content="summary" />
+<meta name="twitter:title" content="nikhil@github ~ interactive terminal" />
+<meta name="twitter:description" content="Nikhil Pravin Pise - interactive terminal-style GitHub profile with live contribution stats." />
+<meta name="twitter:image" content="https://github.com/nikhilpravinpise.png" />
 <style>
   :root{
     --bg:#0d1117; --bg2:#161b22; --frame:#30363d; --muted:#8b949e;
@@ -18,6 +24,7 @@
     --red:#ff5f56; --yellow:#ffbd2e; --green-dot:#27c93f;
   }
   *{box-sizing:border-box;}
+  .sr-only{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0;}
   html{margin:0;padding:0;background:var(--bg);color:var(--white);
     font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;}
   body{margin:0;padding:0;background:transparent;color:var(--white);
@@ -40,6 +47,20 @@
   .dot{width:11px;height:11px;border-radius:50%;}
   .titlebar .label{position:absolute;left:0;right:0;text-align:center;color:var(--muted);font-size:12px;}
 
+  .agent-bar{display:flex;justify-content:space-between;align-items:center;padding:8px 14px;
+    background:var(--bg2);border-bottom:1px solid var(--frame);font-size:12px;gap:8px;flex-wrap:wrap;}
+  .agent-status{display:flex;align-items:center;gap:8px;}
+  .status-dot{width:7px;height:7px;border-radius:50%;background:var(--green);box-shadow:0 0 6px var(--green);}
+  .agent-title{font-weight:600;color:var(--white);}
+  .agent-tag{color:var(--muted);font-size:11px;}
+  .gui-link{color:var(--cyan);font-size:11.5px;}
+
+  .quick-actions{display:flex;flex-wrap:wrap;gap:6px;padding:10px 14px 8px;background:rgba(22,27,34,.6);border-bottom:1px solid var(--frame);}
+  .chip{background:var(--bg2);border:1px solid var(--frame);color:var(--cyan);border-radius:6px;
+    padding:3px 9px;font-family:inherit;font-size:11.5px;cursor:pointer;touch-action:manipulation;transition:background .15s,border-color .15s,color .15s;}
+  .chip:hover{background:#21262d;border-color:var(--cyan);color:var(--white);}
+  .chip:active{transform:scale(.97);}
+
   .term{padding:16px;min-height:360px;max-height:60vh;overflow-y:auto;font-size:13.5px;line-height:1.55;
     scrollbar-width:none;-ms-overflow-style:none;}
   .term::-webkit-scrollbar{display:none;}
@@ -52,13 +73,10 @@
   .out-white{color:var(--white);}
   .out-yellow{color:var(--yellow);}
 
-  .inputRow{display:flex;gap:8px;align-items:center;padding:0 16px 16px;}
+  .inputRow{display:flex;gap:8px;align-items:center;padding:10px 16px 16px;}
   .inputRow .prompt-tag{color:var(--green);}
   #cmdInput{flex:1;background:transparent;border:none;outline:none;color:var(--white);
     font-family:inherit;font-size:13.5px;caret-color:var(--green);}
-  .cursor{display:inline-block;width:8px;height:15px;background:var(--green);
-    animation:blink 1s steps(1) infinite;vertical-align:middle;}
-  @keyframes blink{50%{opacity:0;}}
 
   .hint{text-align:center;color:var(--muted);font-size:12px;margin-top:10px;}
   .hint kbd{background:var(--bg2);border:1px solid var(--frame);border-radius:4px;
@@ -76,6 +94,7 @@
   .heatmap{display:grid;grid-auto-flow:column;grid-template-rows:repeat(7,10px);gap:2px;}
   .cell{width:10px;height:10px;border-radius:2px;cursor:pointer;transition:transform .08s;}
   .cell:hover{transform:scale(1.6);outline:1px solid var(--white);}
+  .cell:focus-visible{transform:scale(1.6);outline:2px solid var(--white);}
   .legend{display:flex;align-items:center;gap:4px;font-size:11px;color:var(--muted);margin-top:8px;}
   .legend .cell{cursor:default;}
   .legend .cell:hover{transform:none;outline:none;}
@@ -91,9 +110,9 @@
     .term{font-size:12.5px;}
     .hero pre{font-size:10px;}
     #cmdInput{font-size:16px;} /* >=16px prevents iOS Safari auto-zoom on focus */
+    .agent-bar{flex-direction:column;align-items:flex-start;}
   }
   @media (prefers-reduced-motion: reduce){
-    .cursor{animation:none;}
     .cell{transition:none;}
   }
 </style>
@@ -101,6 +120,7 @@
 <body>
 
 <div class="wrap">
+  <h1 class="sr-only">Nikhil Pravin Pise - Terminal Portfolio &amp; ML Developer</h1>
 
   <div class="hero">
     <pre id="bannerArt"></pre>
@@ -109,26 +129,45 @@
 
   <div class="window">
     <div class="titlebar">
-      <div class="dot" style="background:var(--red)"></div>
-      <div class="dot" style="background:var(--yellow)"></div>
-      <div class="dot" style="background:var(--green-dot)"></div>
+      <div class="dot" style="background:var(--red)" aria-hidden="true"></div>
+      <div class="dot" style="background:var(--yellow)" aria-hidden="true"></div>
+      <div class="dot" style="background:var(--green-dot)" aria-hidden="true"></div>
       <div class="label">nikhil@github: ~</div>
     </div>
-    <div class="term" id="term"></div>
+    <div class="agent-bar">
+      <div class="agent-status">
+        <span class="status-dot" aria-hidden="true"></span>
+        <span class="agent-title">nikhil-agent v2.6</span>
+        <span class="agent-tag">AI/ML Researcher</span>
+      </div>
+      <a href="https://nikhilpise.tech" target="_blank" rel="noopener noreferrer" class="gui-link">Prefer GUI? nikhilpise.tech -&gt;</a>
+    </div>
+    <div class="quick-actions" id="quickActions" aria-label="quick command actions">
+      <button type="button" class="chip" data-cmd="whoami">whoami</button>
+      <button type="button" class="chip" data-cmd="projects">projects</button>
+      <button type="button" class="chip" data-cmd="experience">experience</button>
+      <button type="button" class="chip" data-cmd="skills">skills</button>
+      <button type="button" class="chip" data-cmd="contributions">contributions</button>
+      <button type="button" class="chip" data-cmd="streak">streak</button>
+      <button type="button" class="chip" data-cmd="resume">resume</button>
+      <button type="button" class="chip" data-cmd="matrix">matrix</button>
+      <button type="button" class="chip" data-cmd="clear">clear</button>
+    </div>
+    <div class="term" id="term" role="log" aria-live="polite"></div>
     <div class="inputRow">
       <span class="prompt-tag">nikhil@github:~$</span>
-      <input id="cmdInput" aria-label="terminal command input" autocomplete="off" autocapitalize="off" spellcheck="false" />
-      <span class="cursor" id="fakeCursor"></span>
+      <input id="cmdInput" type="text" aria-label="terminal command input" autocomplete="off" autocapitalize="off" spellcheck="false" />
     </div>
   </div>
 
-  <div class="hint">type <kbd>help</kbd> to see commands · try <kbd>contributions</kbd>, <kbd>projects</kbd>, or <kbd>matrix</kbd></div>
+  <div class="hint">type <kbd>help</kbd> to see commands · tap any chip above or try <kbd>projects</kbd>, <kbd>resume</kbd>, <kbd>matrix</kbd></div>
 
   <footer>
     <div class="links">
-      <a href="https://www.nikhilpise.me" target="_blank" rel="noopener">portfolio</a>·
-      <a href="https://github.com/nikhilpravinpise" target="_blank" rel="noopener">github</a>·
-      <a href="https://linkedin.com/in/nikhil-pravin-pise" target="_blank" rel="noopener">linkedin</a>·
+      <a href="https://nikhilpise.tech" target="_blank" rel="noopener noreferrer">portfolio</a>·
+      <a href="https://github.com/nikhilpravinpise" target="_blank" rel="noopener noreferrer">github</a>·
+      <a href="https://linkedin.com/in/nikhil-pravin-pise" target="_blank" rel="noopener noreferrer">linkedin</a>·
+      <a href="https://drive.google.com/file/d/1Ko71VMfA1KPwpCn1ZUlVsdhpl9jxbSo_/view?usp=sharing" target="_blank" rel="noopener noreferrer">resume</a>·
       <a href="mailto:nikhilpise2006@gmail.com">email</a>
     </div>
     <div>rendered client-side, no build step · data refreshes daily</div>
@@ -137,7 +176,7 @@
 </div>
 
 <div id="tooltip"></div>
-<canvas id="matrixCanvas" style="position:fixed;inset:0;z-index:-1;display:none;"></canvas>
+<canvas id="matrixCanvas" aria-hidden="true" style="position:fixed;inset:0;z-index:-1;display:none;"></canvas>
 
 <script>
 /* =========================================================================
@@ -269,11 +308,14 @@ function buildHeatmapEl() {
         cell.style.background = PALETTE[lvl];
         cell.setAttribute("role", "img");
         cell.setAttribute("aria-label", tip);
+        cell.tabIndex = 0;
         const showTip = (e) => {
           tooltip.textContent = tip;
           tooltip.style.display = "block";
-          const x = Math.min(e.clientX + 14, window.innerWidth - tooltip.offsetWidth - 8);
-          const y = Math.min(e.clientY + 14, window.innerHeight - tooltip.offsetHeight - 8);
+          const clientX = e.clientX !== undefined ? e.clientX : (cell.getBoundingClientRect().left + 5);
+          const clientY = e.clientY !== undefined ? e.clientY : (cell.getBoundingClientRect().top + 5);
+          const x = Math.min(clientX + 14, window.innerWidth - tooltip.offsetWidth - 8);
+          const y = Math.min(clientY + 14, window.innerHeight - tooltip.offsetHeight - 8);
           tooltip.style.left = Math.max(0, x) + "px";
           tooltip.style.top = Math.max(0, y) + "px";
         };
@@ -287,6 +329,8 @@ function buildHeatmapEl() {
           clearTimeout(tapTimer);
           tapTimer = setTimeout(hideTip, 1500); // touch: let a tap be readable
         });
+        cell.addEventListener("focus", showTip);
+        cell.addEventListener("blur", hideTip);
       }
       grid.appendChild(cell);
     });
@@ -311,23 +355,27 @@ const COMMANDS = {
   help() {
     line(`<span class="out-white">available commands:</span>`);
     [
-      ["whoami", "who is this guy anyway"],
-      ["experience", "work history"],
-      ["skills", "tech stack"],
-      ["projects", "things I've shipped"],
+      ["whoami", "who is this guy anyway (alias: about)"],
+      ["experience", "work and research history"],
+      ["skills", "technical stack and tools"],
+      ["projects", "things I have shipped (alias: ls)"],
       ["contributions", "live GitHub contribution heatmap"],
-      ["streak", "current / longest streak"],
-      ["contact", "how to reach me"],
-      ["photo", "github avatar"],
-      ["matrix", "toggle a little fun"],
-      ["clear", "clear the terminal"],
+      ["streak", "current, longest, and active stats"],
+      ["contact", "portfolio, linkedin, github, email"],
+      ["resume", "open Google Drive resume in new tab"],
+      ["open", "open portfolio, linkedin, github, or resume"],
+      ["photo", "github avatar image"],
+      ["matrix", "toggle matrix digital rain"],
+      ["banner", "reprint ASCII banner art"],
+      ["history", "list session command history"],
+      ["clear", "clear terminal screen (hotkey: Ctrl+L)"],
     ].forEach(([c, d]) => line(`  <span class="out-cmd">${c.padEnd(15)}</span><span class="out-dim">${d}</span>`));
   },
   whoami() {
     line(`<span class="out-white">Pre-final year CS (Data Science) @ SVKM's DJSCE, 9.14 CGPA, based in Mumbai, IN</span>`);
     line(`<span class="out-dim">Currently: Summer ML Research Intern @ IIT Guwahati · Head of ML @ DJS S4DS</span>`);
     line(`<span class="out-dim">3x Hackathon Winner · 8+ National Hackathon Finalist</span>`);
-    line(`<span class="out-dim">3 preliminary asteroid discoveries (IASC x NASA) · builds AI agents & on-device ML</span>`);
+    line(`<span class="out-dim">3 preliminary asteroid discoveries (IASC x NASA) · builds AI agents &amp; on-device ML</span>`);
   },
   experience() {
     [
@@ -337,9 +385,9 @@ const COMMANDS = {
     ].forEach(([d, r, c]) => line(`<span class="out-green">${d.padEnd(17)}</span><span class="out-white">${r.padEnd(28)}</span><span class="out-dim">${c}</span>`));
   },
   skills() {
-    line(`<span class="out-cmd">languages</span>  Python, C/C++, Java, JavaScript (ES6+), Dart, SQL, Bash, HTML5, CSS3`);
-    line(`<span class="out-cmd">frameworks</span> PyTorch, TensorFlow, Scikit-Learn, Hugging Face, LangGraph, Flask, FastAPI, React, Flutter, Docker, Git`);
-    line(`<span class="out-cmd">ai / ml  </span>  LLMs, RAG, AI Agents, MCP, On-Device LLMs, GraphQL, REST APIs, OAuth, Webhooks`);
+    line(`<span class="out-cmd">languages</span>    Python, C/C++, Java, JavaScript (ES6+), Dart, SQL, Bash, HTML5, CSS3`);
+    line(`<span class="out-cmd">frameworks</span>   PyTorch, TensorFlow, Scikit-Learn, Hugging Face, LangGraph, Flask, FastAPI, React, Flutter, Docker, Git`);
+    line(`<span class="out-cmd">ai / ml</span>      LLMs, RAG, AI Agents, MCP, On-Device LLMs, GraphQL, REST APIs, OAuth, Webhooks`);
   },
   projects() {
     [
@@ -350,14 +398,40 @@ const COMMANDS = {
     ].forEach(([n, d, url]) => {
       line(`<span class="out-cmd">&gt; ${n}</span>`);
       line(`  <span class="out-dim">${d}</span>`);
-      line(`  <a href="${url}" target="_blank" rel="noopener">${url}</a>`);
+      line(`  <a href="${url}" target="_blank" rel="noopener noreferrer">${url}</a>`);
     });
   },
   contact() {
-    line(`<span class="out-white">portfolio</span>  <a href="https://www.nikhilpise.me" target="_blank">nikhilpise.me</a>`);
-    line(`<span class="out-white">linkedin </span>  <a href="https://linkedin.com/in/nikhil-pravin-pise" target="_blank">linkedin.com/in/nikhil-pravin-pise</a>`);
-    line(`<span class="out-white">github   </span>  <a href="https://github.com/nikhilpravinpise" target="_blank">github.com/nikhilpravinpise</a>`);
+    line(`<span class="out-white">portfolio</span>  <a href="https://nikhilpise.tech" target="_blank" rel="noopener noreferrer">nikhilpise.tech</a>`);
+    line(`<span class="out-white">resume   </span>  <a href="https://drive.google.com/file/d/1Ko71VMfA1KPwpCn1ZUlVsdhpl9jxbSo_/view?usp=sharing" target="_blank" rel="noopener noreferrer">Google Drive Resume</a>`);
+    line(`<span class="out-white">linkedin </span>  <a href="https://linkedin.com/in/nikhil-pravin-pise" target="_blank" rel="noopener noreferrer">linkedin.com/in/nikhil-pravin-pise</a>`);
+    line(`<span class="out-white">github   </span>  <a href="https://github.com/nikhilpravinpise" target="_blank" rel="noopener noreferrer">github.com/nikhilpravinpise</a>`);
     line(`<span class="out-white">email    </span>  <a href="mailto:nikhilpise2006@gmail.com">nikhilpise2006@gmail.com</a>`);
+  },
+  resume() {
+    const url = "https://drive.google.com/file/d/1Ko71VMfA1KPwpCn1ZUlVsdhpl9jxbSo_/view?usp=sharing";
+    line(`<span class="out-dim">opening resume in new tab...</span>`);
+    line(`<a href="${url}" target="_blank" rel="noopener noreferrer">${url}</a>`);
+    window.open(url, "_blank", "noopener,noreferrer");
+  },
+  open(args) {
+    const target = (args && args[0] || "").toLowerCase();
+    const map = {
+      portfolio: "https://nikhilpise.tech",
+      resume: "https://drive.google.com/file/d/1Ko71VMfA1KPwpCn1ZUlVsdhpl9jxbSo_/view?usp=sharing",
+      linkedin: "https://linkedin.com/in/nikhil-pravin-pise",
+      github: "https://github.com/nikhilpravinpise",
+    };
+    if (map[target]) {
+      line(`<span class="out-dim">opening ${target}...</span>`);
+      window.open(map[target], "_blank", "noopener,noreferrer");
+    } else {
+      line(`<span class="out-dim">usage: open [portfolio|resume|linkedin|github]</span>`);
+    }
+  },
+  history() {
+    if (cmdHistory.length === 0) { line(`<span class="out-dim">no commands in history</span>`); return; }
+    cmdHistory.forEach((c, i) => line(`  <span class="out-dim">${(i + 1).toString().padStart(3, " ")}</span>  <span class="out-white">${escapeHtml(c)}</span>`));
   },
   photo() {
     const img = document.createElement("img");
@@ -374,14 +448,15 @@ const COMMANDS = {
   },
   streak() {
     if (!DATA) { line(`<span class="out-dim">loading contribution data...</span>`); return; }
-    line(`<span class="out-green">current streak:</span>  ${DATA.current_streak.length} days (${DATA.current_streak.start} → ${DATA.current_streak.end})`);
-    line(`<span class="out-green">longest streak:</span>  ${DATA.longest_streak.length} days (${DATA.longest_streak.start} → ${DATA.longest_streak.end})`);
+    line(`<span class="out-green">current streak:</span>  ${DATA.current_streak.length} days (${DATA.current_streak.start || "none"} -&gt; ${DATA.current_streak.end || "none"})`);
+    line(`<span class="out-green">longest streak:</span>  ${DATA.longest_streak.length} days (${DATA.longest_streak.start || "none"} -&gt; ${DATA.longest_streak.end || "none"})`);
     line(`<span class="out-green">best day:</span>       ${DATA.best_day.count} contributions${DATA.best_day.count > 0 ? " on " + DATA.best_day.date : ""}`);
+    line(`<span class="out-green">active days:</span>    ${DATA.active_days || 0} days (${DATA.avg_per_active_day || 0} avg / active day)`);
     line(`<span class="out-green">total:</span>          ${DATA.total_contributions.toLocaleString()} contributions since ${DATA.range.start}`);
   },
   contributions() {
     if (!DATA) { line(`<span class="out-dim">loading contribution data...</span>`); return; }
-    line(`<span class="out-dim">${DATA.total_contributions.toLocaleString()} contributions · ${DATA.range.start} → ${DATA.range.end}</span>`);
+    line(`<span class="out-dim">${DATA.total_contributions.toLocaleString()} contributions · ${DATA.range.start} -&gt; ${DATA.range.end}</span>`);
     const div = document.createElement("div");
     div.className = "line";
     div.appendChild(buildHeatmapEl());
@@ -411,39 +486,120 @@ const COMMANDS = {
 COMMANDS["about"] = COMMANDS.whoami;
 COMMANDS["ls"] = COMMANDS.projects;
 
+const cmdHistory = [];
+let historyIndex = 0;
+let historyDraft = "";
+
 function runCommand(raw) {
   const trimmed = raw.trim();
   line(`<span class="prompt-tag">nikhil@github:~$</span> <span class="out-white">${escapeHtml(trimmed)}</span>`, "prompt-line");
   if (!trimmed) return;
+
+  if (cmdHistory.length === 0 || cmdHistory[cmdHistory.length - 1] !== trimmed) {
+    cmdHistory.push(trimmed);
+  }
+  historyIndex = cmdHistory.length;
+  historyDraft = "";
+
   const [cmd, ...args] = trimmed.split(/\s+/);
   const key = cmd.toLowerCase();
-  if (key === "open") {
-    const target = (args[0] || "").toLowerCase();
-    const map = {
-      portfolio: "https://www.nikhilpise.me",
-      linkedin: "https://linkedin.com/in/nikhil-pravin-pise",
-      github: "https://github.com/nikhilpravinpise",
-    };
-    if (map[target]) { line(`<span class="out-dim">opening ${target}...</span>`); window.open(map[target], "_blank"); }
-    else line(`<span class="out-dim">usage: open [portfolio|linkedin|github]</span>`);
-    return;
+
+  if (Object.hasOwn(COMMANDS, key) && typeof COMMANDS[key] === "function") {
+    COMMANDS[key](args);
+  } else {
+    line(`<span class="out-dim">command not found: ${escapeHtml(cmd)} - type 'help'</span>`);
   }
-  if (COMMANDS[key]) { COMMANDS[key](args); }
-  else line(`<span class="out-dim">command not found: ${escapeHtml(cmd)} - type 'help'</span>`);
 }
 
 function escapeHtml(s) {
   return s.replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
 }
 
+const allCmdNames = [
+  "help", "whoami", "about", "experience", "skills", "projects", "ls",
+  "contributions", "streak", "contact", "resume", "open", "photo",
+  "matrix", "banner", "history", "clear"
+];
+const openSubTargets = ["portfolio", "resume", "linkedin", "github"];
+
 input.addEventListener("keydown", (e) => {
   if (e.key === "Enter") {
     const val = input.value;
     input.value = "";
     runCommand(val);
+  } else if (e.key === "ArrowUp") {
+    e.preventDefault();
+    if (cmdHistory.length === 0) return;
+    if (historyIndex === cmdHistory.length) {
+      historyDraft = input.value;
+    }
+    if (historyIndex > 0) {
+      historyIndex--;
+    }
+    input.value = cmdHistory[historyIndex];
+    input.setSelectionRange(input.value.length, input.value.length);
+  } else if (e.key === "ArrowDown") {
+    e.preventDefault();
+    if (cmdHistory.length === 0) return;
+    if (historyIndex < cmdHistory.length - 1) {
+      historyIndex++;
+      input.value = cmdHistory[historyIndex];
+    } else if (historyIndex === cmdHistory.length - 1) {
+      historyIndex = cmdHistory.length;
+      input.value = historyDraft;
+    }
+    input.setSelectionRange(input.value.length, input.value.length);
+  } else if (e.key === "Tab") {
+    e.preventDefault();
+    const val = input.value;
+    const trimmedStart = val.trimStart();
+    if (!trimmedStart) return;
+    const parts = trimmedStart.split(/\s+/);
+    if (parts.length === 1) {
+      const prefix = parts[0].toLowerCase();
+      const matches = allCmdNames.filter((c) => c.startsWith(prefix));
+      if (matches.length === 1) {
+        input.value = matches[0] + " ";
+      } else if (matches.length > 1) {
+        line(`<span class="prompt-tag">nikhil@github:~$</span> <span class="out-white">${escapeHtml(val)}</span>`, "prompt-line");
+        line(`<span class="out-dim">${matches.join("  ")}</span>`);
+      }
+    } else if (parts.length === 2 && parts[0].toLowerCase() === "open") {
+      const prefix = parts[1].toLowerCase();
+      const matches = openSubTargets.filter((t) => t.startsWith(prefix));
+      if (matches.length === 1) {
+        input.value = "open " + matches[0] + " ";
+      } else if (matches.length > 1) {
+        line(`<span class="prompt-tag">nikhil@github:~$</span> <span class="out-white">${escapeHtml(val)}</span>`, "prompt-line");
+        line(`<span class="out-dim">${matches.join("  ")}</span>`);
+      }
+    }
+  } else if (e.ctrlKey && e.key.toLowerCase() === "l") {
+    e.preventDefault();
+    COMMANDS.clear();
   }
 });
-document.addEventListener("click", () => input.focus());
+
+document.addEventListener("click", (e) => {
+  if (e.target.closest("a, button, input, .cell, kbd, .chip")) return;
+  if (window.getSelection() && window.getSelection().toString().length > 0) return;
+  if (window.matchMedia("(min-width: 768px)").matches) input.focus();
+});
+
+const inputRow = document.querySelector(".inputRow");
+if (inputRow) {
+  inputRow.addEventListener("click", () => input.focus());
+}
+
+const quickBox = document.getElementById("quickActions");
+if (quickBox) {
+  quickBox.addEventListener("click", (e) => {
+    const btn = e.target.closest(".chip");
+    if (!btn) return;
+    const cmd = btn.getAttribute("data-cmd");
+    if (cmd) runCommand(cmd);
+  });
+}
 
 /* ---------------------------------------------------------------------- */
 let matrixOn = false;
@@ -462,7 +618,7 @@ function startMatrix() {
   canvas.width = window.innerWidth;
   canvas.height = window.innerHeight;
   const cols = Math.floor(canvas.width / 14);
-  const drops = new Array(cols).fill(0);
+  const drops = Array.from({ length: cols }, () => Math.floor(Math.random() * -35));
   const chars = "01アビヴァシシュタ<>/{}[]#*";
   function draw() {
     if (!matrixOn || myLoop !== matrixLoop) return;
@@ -484,7 +640,7 @@ window.addEventListener("resize", () => { if (matrixOn) startMatrix(); });
 /* ---------------------------------------------------------------------- */
 function printHome() {
   line(`<span class="out-green">connected to github.com/nikhilpravinpise</span>`);
-  line(`<span class="out-dim">type 'help' to see available commands</span>`);
+  line(`<span class="out-dim">type 'help' or tap any chip above to explore</span>`);
   blank();
 
   const statsWrap = document.createElement("div");
@@ -499,7 +655,7 @@ function printHome() {
 function boot() {
   printHome();
   runCommand("whoami");
-  input.focus();
+  if (window.matchMedia("(min-width: 768px)").matches) input.focus();
 }
 
 loadData();

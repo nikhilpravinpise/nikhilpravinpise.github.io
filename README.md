@@ -15,11 +15,13 @@ projects        things I've shipped (alias: ls)
 contributions   live GitHub contribution heatmap
 streak          current / longest streak
 contact         how to reach me
+resume          view / download my resume
+open            open portfolio / resume / linkedin / github in a new tab
 photo           github avatar
-open            open portfolio / github / linkedin in a new tab
-matrix          toggle a little fun
+matrix          toggle matrix digital rain
 banner          reprint the ASCII banner
-clear           clear the terminal
+history         list session command history
+clear           clear the terminal (hotkey: Ctrl+L)
 ```
 
 ## How it works
