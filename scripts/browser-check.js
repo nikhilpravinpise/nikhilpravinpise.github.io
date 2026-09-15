@@ -8,6 +8,7 @@
 //   - screenshots land in docs/screens/ (pass --shots <dir> to change)
 //
 //   node scripts/browser-check.js [--shots outdir] [--url http://localhost:8000]
+/* global window, document */ // referenced inside page.evaluate callbacks
 
 import fs from "node:fs";
 import path from "node:path";
