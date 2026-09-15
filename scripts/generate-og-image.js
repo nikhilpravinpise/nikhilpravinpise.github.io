@@ -53,6 +53,7 @@ function render(browser, htmlPath, outPath, width, height) {
     browser,
     [
       "--headless=new",
+      "--no-sandbox", // required inside CI containers/runners
       "--disable-gpu",
       "--hide-scrollbars",
       "--force-device-scale-factor=1",
