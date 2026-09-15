@@ -3,7 +3,7 @@
 // - data/*.json: network-first (fresh data when online, last-seen offline)
 // Bump CACHE_VERSION whenever the precache list changes materially.
 
-const CACHE_VERSION = "npp-v3.0.0";
+const CACHE_VERSION = "npp-v3.0.1";
 
 const SHELL = [
   "./",
@@ -45,7 +45,11 @@ self.addEventListener("activate", (e) => {
 });
 
 function isData(url) {
-  return url.origin === location.origin && /\/data\/.*\.json$/.test(url.pathname);
+  // regenerated daily - must not go stale inside a fixed-version cache
+  return (
+    url.origin === location.origin &&
+    (/\/data\/.*\.json$/.test(url.pathname) || url.pathname.endsWith("/assets/fallback.js"))
+  );
 }
 
 self.addEventListener("fetch", (e) => {

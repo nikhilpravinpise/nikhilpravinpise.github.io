@@ -100,6 +100,10 @@ test("history persists to localStorage across sessions", async () => {
   const stored = JSON.parse(ctx.window.localStorage.getItem("npp:history"));
   assert.ok(stored.includes("persisted-xyz"));
 
+  // commands sync to the #hash as deep links - clear it so the reboot
+  // doesn't auto-run the last command
+  ctx.window.history.replaceState(null, "", "#");
+
   // a second boot in the same window restores it
   await import(`../assets/app.js?reboot=${Date.now()}`);
   await ctx.window.__appReady;

@@ -114,8 +114,9 @@ export function summarize(username, totalContributions, days, generatedAt) {
   };
 }
 
-/** "3d ago" / "2mo ago" style relative time for repo listings. */
-export function relativeTime(isoDate, now = Date.now()) {
+/** "3d ago" / "2mo ago" style relative time. `now` (ms epoch) is required
+ *  from the caller so this module stays deterministic under test. */
+export function relativeTime(isoDate, now) {
   const then = new Date(isoDate).getTime();
   if (Number.isNaN(then)) return "";
   const days = Math.max(0, Math.floor((now - then) / 86_400_000));

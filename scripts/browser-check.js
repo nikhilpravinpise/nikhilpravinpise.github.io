@@ -120,9 +120,11 @@ async function main() {
   await page.setViewport({ width: 390, height: 844, isMobile: true, deviceScaleFactor: 2 });
   await page.goto(`${base}/?cmd=contributions`, { waitUntil: "networkidle0" });
   const overflow = await page.evaluate(
-    () => document.documentElement.clientWidth - window.innerWidth,
+    () =>
+      Math.max(document.documentElement.scrollWidth, document.body.scrollWidth) -
+      window.innerWidth,
   );
-  check("mobile: no horizontal page overflow", overflow <= 0, `docW excess=${overflow}`);
+  check("mobile: no horizontal page overflow", overflow <= 0, `scrollW excess=${overflow}`);
   const snapped = await page.evaluate(() => {
     const w = document.querySelector(".heatmap-wrap");
     return w ? w.scrollWidth - w.clientWidth - w.scrollLeft < 8 : false;

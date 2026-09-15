@@ -69,6 +69,16 @@ function collectLocalRefs() {
       found.get(ref).push("sw.js:SHELL");
     }
   }
+  // markdown links/images: [text](target) and ![alt](target)
+  for (const file of SCAN_FILES.filter((f) => f.endsWith(".md"))) {
+    const text = fs.readFileSync(path.join(ROOT, file), "utf8");
+    for (const m of text.matchAll(/!?\[[^\]]*\]\(([^)\s]+)\)/g)) {
+      const ref = m[1].replace(/[?#].*$/, "");
+      if (/^(https?:|mailto:|#|\/)/.test(ref) || ref === "") continue;
+      if (!found.has(ref)) found.set(ref, []);
+      found.get(ref).push(`${file}:md`);
+    }
+  }
   return found;
 }
 

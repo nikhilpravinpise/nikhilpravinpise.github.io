@@ -33,11 +33,11 @@ test("data loaded: stats show fixture totals", async () => {
   reduced.restore();
 });
 
-test("every visible command runs without throwing and prints output", () => {
+test("every visible command runs without throwing and prints output", async () => {
   for (const c of ctx.app.commands.registry) {
     if (c.hidden) continue;
     const before = ctx.term.querySelectorAll(".line").length;
-    assert.doesNotThrow(() => ctx.app.commands.run(c.name), c.name);
+    await ctx.app.commands.run(c.name); // copy is async - must be awaited
     if (c.name !== "clear") {
       // `clear` removes lines by design; assert its home reprint instead
       const after = ctx.term.querySelectorAll(".line").length;

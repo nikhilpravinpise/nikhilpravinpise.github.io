@@ -207,7 +207,13 @@ if (quickBox) {
 
 function deepLinkCommand() {
   const fromQuery = new URLSearchParams(location.search).get("cmd");
-  const fromHash = decodeURIComponent(location.hash || "").replace(/^#\/?/, "");
+  let fromHash;
+  try {
+    fromHash = decodeURIComponent(location.hash || "").replace(/^#\/?/, "");
+  } catch (_e) {
+    // malformed percent-encoding (e.g. #%E0%A4%A) - not a valid deep link
+    return null;
+  }
   const raw = (fromQuery || fromHash || "").trim();
   if (!raw || raw.length > 60 || !/^[\w][\w -]*$/i.test(raw)) return null;
   const name = raw.split(/\s+/)[0].toLowerCase();
@@ -224,7 +230,9 @@ window.addEventListener("hashchange", () => {
 async function boot() {
   initTheme();
   printHome();
-  commands.run("whoami");
+  // whoami is the boot greeting, not user input - it must not rewrite the
+  // address bar or it would clobber a #hash deep link before we read it.
+  commands.run("whoami", { syncHash: false });
   if (matchMedia("(min-width: 768px)").matches) input.focus();
 
   await Promise.all([loadContributions(state), loadRepos(state)]);

@@ -97,9 +97,9 @@ export function buildColumns(days) {
 }
 
 /**
- * Column index -> month label. A column is labeled when it contains the
- * 1st of a month; the first column always gets a label even when the range
- * starts mid-month (GitHub does the same for the leading partial month).
+ * Returns Map<columnIndex, monthLabel>. A column is labeled when it contains
+ * the 1st of a month; the first column always gets a label even when the
+ * range starts mid-month (GitHub does the same for the leading partial month).
  */
 export function monthLabels(columns) {
   const labels = new Map();
@@ -261,7 +261,7 @@ export function scrollHeatmapToEnd(wrap) {
 const BAR = "█";
 const GRAPH_WIDTH = 38;
 
-/** ASCII bar chart of monthly totals; returns one string of lines. */
+/** ASCII bar chart of monthly totals; returns an array of line strings. */
 export function buildGraph(data) {
   const monthly = data.monthly || [];
   const max = Math.max(1, ...monthly.map((m) => m.total));

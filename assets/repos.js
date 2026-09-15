@@ -21,21 +21,24 @@ export async function loadRepos(state) {
   return state.reposDoc;
 }
 
-export function renderRepos(state, term) {
+const HEX_COLOR = /^#[0-9a-fA-F]{3,8}$/;
+
+export function renderRepos(state, term, now = Date.now()) {
   const doc = state.reposDoc;
   if (!doc) {
     term.line(`<span class="out-dim">loading repository data...</span>`);
     return;
   }
   term.line(
-    `<span class="out-dim">top public repositories · updated ${doc.generated_at.slice(0, 10)}</span>`,
+    `<span class="out-dim">top public repositories · updated ${escapeHtml(doc.generated_at.slice(0, 10))}</span>`,
   );
   for (const r of doc.repos) {
     const stars = r.stars > 0 ? ` ★${r.stars}` : "";
+    const color = HEX_COLOR.test(r.language_color || "") ? r.language_color : "var(--muted)";
     const lang = r.language
-      ? ` <span class="lang-dot" style="color:${r.language_color || "var(--muted)"}">●</span> ${escapeHtml(r.language)}`
+      ? ` <span class="lang-dot" style="color:${color}">●</span> ${escapeHtml(r.language)}`
       : "";
-    const when = r.pushed_at ? ` · ${relativeTime(r.pushed_at)}` : "";
+    const when = r.pushed_at ? ` · ${escapeHtml(relativeTime(r.pushed_at, now))}` : "";
     term.line(
       `<span class="out-cmd">&gt; ${escapeHtml(r.name)}</span>` +
         `<span class="out-dim">${stars}${lang}${when}</span>`,

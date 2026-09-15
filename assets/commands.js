@@ -154,11 +154,12 @@ export function createCommands(ctx) {
       name: "contact",
       summary: "portfolio, linkedin, github, email",
       run() {
-        line(`<span class="out-white">portfolio</span>  <a href="${PROFILE.links.portfolio}" target="_blank" rel="noopener noreferrer">nikhilpise.tech</a>`);
-        line(`<span class="out-white">resume   </span>  <a href="${PROFILE.links.resume}" target="_blank" rel="noopener noreferrer">Google Drive Resume</a>`);
-        line(`<span class="out-white">linkedin </span>  <a href="${PROFILE.links.linkedin}" target="_blank" rel="noopener noreferrer">linkedin.com/in/nikhil-pravin-pise</a>`);
-        line(`<span class="out-white">github   </span>  <a href="${PROFILE.links.github}" target="_blank" rel="noopener noreferrer">github.com/nikhilpravinpise</a>`);
-        line(`<span class="out-white">email    </span>  <a href="mailto:${PROFILE.email}">${PROFILE.email}</a>`);
+        const l = PROFILE.links;
+        line(`<span class="out-white">portfolio</span>  <a href="${escapeHtml(l.portfolio)}" target="_blank" rel="noopener noreferrer">nikhilpise.tech</a>`);
+        line(`<span class="out-white">resume   </span>  <a href="${escapeHtml(l.resume)}" target="_blank" rel="noopener noreferrer">Google Drive Resume</a>`);
+        line(`<span class="out-white">linkedin </span>  <a href="${escapeHtml(l.linkedin)}" target="_blank" rel="noopener noreferrer">linkedin.com/in/nikhil-pravin-pise</a>`);
+        line(`<span class="out-white">github   </span>  <a href="${escapeHtml(l.github)}" target="_blank" rel="noopener noreferrer">github.com/nikhilpravinpise</a>`);
+        line(`<span class="out-white">email    </span>  <a href="mailto:${escapeHtml(PROFILE.email)}">${escapeHtml(PROFILE.email)}</a>`);
       },
     },
     {
@@ -167,7 +168,7 @@ export function createCommands(ctx) {
       run() {
         const url = PROFILE.links.resume;
         line(`<span class="out-dim">opening resume in new tab...</span>`);
-        line(`<a href="${url}" target="_blank" rel="noopener noreferrer">${url}</a>`);
+        line(`<a href="${escapeHtml(url)}" target="_blank" rel="noopener noreferrer">${escapeHtml(url)}</a>`);
         env.openWindow(url);
       },
     },
@@ -393,7 +394,8 @@ export function createCommands(ctx) {
     theme: THEMES.map((t) => t.id),
   };
 
-  function run(raw) {
+  function run(raw, opts = {}) {
+    const { syncHash = true } = opts;
     const trimmed = raw.trim();
     term.echo(trimmed);
     if (!trimmed) return;
@@ -410,8 +412,9 @@ export function createCommands(ctx) {
     const key = cmd.toLowerCase();
     const entry = byName.get(key);
     if (entry) {
-      entry.run(args);
-      env.syncHash(entry.name);
+      const result = entry.run(args);
+      if (syncHash) env.syncHash(entry.name);
+      return result;
     } else {
       const suggestion = [...byName.keys()]
         .map((n) => [n, levenshtein(key, n)])

@@ -46,16 +46,20 @@ export function validateContributions(doc) {
     issues.push("days must be a non-empty array");
     return issues;
   }
+  let malformedDays = 0;
   for (let i = 0; i < days.length; i++) {
     const d = days[i];
     if (!isObject(d) || !ISO_DATE.test(d.date || "") || !Number.isInteger(d.count) || d.count < 0) {
       issues.push(`days[${i}] malformed: ${JSON.stringify(d)}`);
+      malformedDays++;
       continue;
     }
     if (i > 0 && dayGap(days[i - 1].date, d.date) !== 1) {
       issues.push(`days not contiguous at index ${i}: ${days[i - 1].date} -> ${d.date}`);
     }
   }
+  // downstream math dereferences every element - stop here if any are bad
+  if (malformedDays) return issues;
 
   if (isObject(doc.range)) {
     if (doc.range.start !== days[0].date) issues.push("range.start does not match days[0]");
