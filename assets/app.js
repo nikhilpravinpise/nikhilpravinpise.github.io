@@ -177,7 +177,7 @@ document.addEventListener("click", (e) => {
   if (matchMedia("(min-width: 768px)").matches) input.focus();
 });
 
-const inputRow = document.querySelector(".inputRow");
+const inputRow = document.querySelector(".input-row");
 if (inputRow) inputRow.addEventListener("click", () => input.focus());
 
 // scroll-affordance fades on the terminal pane (scrollbar is hidden)

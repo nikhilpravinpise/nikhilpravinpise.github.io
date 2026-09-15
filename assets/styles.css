@@ -103,8 +103,8 @@ a:focus-visible,.chip:focus-visible,.cell:focus-visible,.skip:focus{
 .out-yellow{color:var(--yellow);}
 .lang-dot{font-size:10px;}
 
-.inputRow{display:flex;gap:8px;align-items:center;padding:10px 16px 16px;}
-.inputRow .prompt-tag{color:var(--green);}
+.input-row{display:flex;gap:8px;align-items:center;padding:10px 16px 16px;}
+.input-row .prompt-tag{color:var(--green);}
 #cmdInput{flex:1;background:transparent;border:none;outline:none;color:var(--white);
   font-family:inherit;font-size:13.5px;caret-color:var(--green);}
 
