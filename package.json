@@ -1,0 +1,31 @@
+{
+  "name": "nikhilpravinpise-github-io",
+  "version": "3.0.0",
+  "private": true,
+  "type": "module",
+  "description": "Interactive terminal-style GitHub profile - nikhilpravinpise.github.io",
+  "engines": {
+    "node": ">=22"
+  },
+  "scripts": {
+    "dev": "node scripts/dev-server.js",
+    "test": "node --test",
+    "test:watch": "node --test --watch",
+    "lint": "eslint .",
+    "lint:fix": "eslint . --fix",
+    "validate": "node scripts/validate-data.js",
+    "sync": "node scripts/sync-github-data.js",
+    "check:links": "node scripts/check-links.js",
+    "check:browser": "node scripts/browser-check.js",
+    "og": "node scripts/generate-og-image.js",
+    "check": "npm run lint && npm test && npm run validate"
+  },
+  "devDependencies": {
+    "@eslint/js": "^10.0.0",
+    "eslint": "^10.10.0",
+    "globals": "^17.12.0",
+    "html-validate": "^11.15.0",
+    "jsdom": "^30.0.1",
+    "puppeteer-core": "25.10.0"
+  }
+}
