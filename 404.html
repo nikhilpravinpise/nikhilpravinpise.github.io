@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>404 ~ command not found</title>
+<meta name="robots" content="noindex">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Crect width='16' height='16' rx='3' fill='%230d1117'/%3E%3Ctext x='2' y='12' font-family='monospace' font-size='10' fill='%2339d353'%3E%3E_%3C/text%3E%3C/svg%3E">
+<style>
+  html{background:#0d1117;color:#e6edf3;font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;}
+  body{margin:0;min-height:100vh;display:flex;align-items:center;justify-content:center;padding:24px;}
+  .win{width:100%;max-width:560px;background:#0d1117;border:1px solid #30363d;border-radius:10px;
+    overflow:hidden;box-shadow:0 20px 60px -20px rgba(0,0,0,.6);}
+  .bar{display:flex;align-items:center;gap:8px;padding:9px 14px;background:#161b22;border-bottom:1px solid #30363d;position:relative;}
+  .dot{width:11px;height:11px;border-radius:50%;}
+  .bar .label{position:absolute;left:0;right:0;text-align:center;color:#8b949e;font-size:12px;}
+  .pane{padding:20px 18px;font-size:13.5px;line-height:1.7;white-space:pre-wrap;word-break:break-word;}
+  .p{color:#39d353;} .dim{color:#8b949e;} .w{color:#e6edf3;}
+  a{color:#58a6ff;text-decoration:none;} a:hover{text-decoration:underline;}
+</style>
+</head>
+<body>
+<div class="win">
+  <div class="bar">
+    <div class="dot" style="background:#ff5f56"></div>
+    <div class="dot" style="background:#ffbd2e"></div>
+    <div class="dot" style="background:#27c93f"></div>
+    <div class="label">nikhil@github: ~</div>
+  </div>
+  <div class="pane"><span class="p">nikhil@github:~$</span> <span class="w">cd <span id="path">/unknown</span></span>
+<span class="dim">cd: no such file or directory: <span id="path2">/unknown</span> (404)</span>
+<span class="dim">hint: the home directory still exists</span>
+<span class="p">nikhil@github:~$</span> <span class="w">cd <a href="/">~</a></span></div>
+</div>
+<script>
+  var p = location.pathname;
+  document.getElementById("path").textContent = p;
+  document.getElementById("path2").textContent = p;
+</script>
+</body>
+</html>

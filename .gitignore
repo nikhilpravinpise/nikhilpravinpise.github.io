@@ -1,0 +1,10 @@
+node_modules/
+coverage/
+*.log
+.DS_Store
+Thumbs.db
+
+# scratch
+plan.md
+scripts/.og-render*.html
+docs/screens/
