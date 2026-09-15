@@ -1,0 +1,68 @@
+<!doctype html>
+<!-- Source artwork for assets/og-image.png. Rendered at exactly 1200x630 by
+     scripts/generate-og-image.js via headless Chrome/Edge. {{TOKENS}} are
+     filled from data/contributions.json at generation time. -->
+<html>
+<head>
+<meta charset="utf-8">
+<style>
+  *{box-sizing:border-box;margin:0;padding:0;}
+  html,body{width:1200px;height:630px;overflow:hidden;background:#0d1117;
+    font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,"Courier New",monospace;}
+  body{display:flex;align-items:center;justify-content:center;}
+  .win{width:1060px;height:540px;background:#0d1117;border:1px solid #30363d;
+    border-radius:14px;overflow:hidden;box-shadow:0 30px 80px -20px rgba(0,0,0,.7);
+    display:flex;flex-direction:column;}
+  .bar{display:flex;align-items:center;gap:10px;padding:14px 20px;
+    background:#161b22;border-bottom:1px solid #30363d;position:relative;}
+  .dot{width:14px;height:14px;border-radius:50%;}
+  .bar .label{position:absolute;left:0;right:0;text-align:center;color:#8b949e;font-size:15px;}
+  .body{flex:1;padding:26px 30px;display:flex;flex-direction:column;}
+  .prompt{font-size:17px;color:#39d353;margin-bottom:10px;}
+  .prompt .cmd{color:#e6edf3;}
+  .name{font-size:56px;font-weight:700;color:#e6edf3;letter-spacing:2px;line-height:1.1;}
+  .name .at{color:#39d353;}
+  .tag{font-size:18px;color:#8b949e;margin-top:8px;}
+  .sub{font-size:15px;color:#8b949e;margin-top:4px;}
+  .stats{display:flex;gap:14px;margin-top:22px;}
+  .stat{border:1px solid #30363d;border-radius:10px;padding:14px 18px;background:#161b22;min-width:150px;}
+  .stat .num{font-size:30px;color:#39d353;font-weight:700;}
+  .stat .lbl{font-size:11px;color:#8b949e;text-transform:uppercase;letter-spacing:.06em;margin-top:4px;}
+  .hm{display:grid;grid-auto-flow:column;grid-template-rows:repeat(7,11px);gap:3px;
+    margin-top:auto;width:max-content;}
+  .cell{width:11px;height:11px;border-radius:2px;background:#161b22;}
+  .cell.l1{background:#0e4429;} .cell.l2{background:#146c37;} .cell.l3{background:#26a648;}
+  .cell.l4{background:#39d353;} .cell.l5{background:#7cf2a0;}
+  .foot{display:flex;justify-content:space-between;align-items:center;margin-top:18px;}
+  .url{font-size:16px;color:#58a6ff;}
+  .sig{font-size:12px;color:#8b949e;}
+</style>
+</head>
+<body>
+<div class="win">
+  <div class="bar">
+    <div class="dot" style="background:#ff5f56"></div>
+    <div class="dot" style="background:#ffbd2e"></div>
+    <div class="dot" style="background:#27c93f"></div>
+    <div class="label">nikhil@github: ~</div>
+  </div>
+  <div class="body">
+    <div class="prompt">nikhil@github:~$ <span class="cmd">whoami</span></div>
+    <div class="name">NIKHIL <span class="at">PISE</span></div>
+    <div class="tag">Pre-final CS (Data Science) @ DJSCE · ML Research Intern @ IIT Guwahati</div>
+    <div class="sub">3x Hackathon Winner · asteroid hunter (IASC x NASA) · builds AI agents &amp; on-device ML</div>
+    <div class="stats">
+      <div class="stat"><div class="num">{{TOTAL}}</div><div class="lbl">contributions</div></div>
+      <div class="stat"><div class="num">{{STREAK}}</div><div class="lbl">day streak</div></div>
+      <div class="stat"><div class="num">{{LONGEST}}</div><div class="lbl">best streak</div></div>
+      <div class="stat"><div class="num">{{BEST}}</div><div class="lbl">in one day</div></div>
+    </div>
+    <div class="hm">{{HEATMAP}}</div>
+    <div class="foot">
+      <div class="url">nikhilpravinpise.github.io</div>
+      <div class="sig">rendered client-side · data refreshes daily</div>
+    </div>
+  </div>
+</div>
+</body>
+</html>

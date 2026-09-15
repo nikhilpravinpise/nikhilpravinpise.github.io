@@ -1,0 +1,23 @@
+name: Link check
+
+on:
+  schedule:
+    - cron: "0 9 * * 1" # mondays
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  links:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Check external links and local file references
+        run: node scripts/check-links.js
