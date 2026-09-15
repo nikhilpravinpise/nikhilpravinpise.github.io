@@ -112,6 +112,10 @@ export function validateRepos(doc) {
   if (Number.isNaN(Date.parse(doc.generated_at))) {
     issues.push("generated_at is not a valid ISO timestamp");
   }
+  // neofetch derives "days on github" from this - catch it missing early
+  if (doc.user_created_at && Number.isNaN(Date.parse(doc.user_created_at))) {
+    issues.push("user_created_at is present but not a valid timestamp");
+  }
   doc.repos.forEach((r, i) => {
     if (!isObject(r) || typeof r.name !== "string" || !r.name) {
       issues.push(`repos[${i}] missing name`);

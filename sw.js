@@ -3,7 +3,7 @@
 // - data/*.json: network-first (fresh data when online, last-seen offline)
 // Bump CACHE_VERSION whenever the precache list changes materially.
 
-const CACHE_VERSION = "npp-v3.0.1";
+const CACHE_VERSION = "npp-v3.0.2";
 
 const SHELL = [
   "./",
@@ -52,34 +52,48 @@ function isData(url) {
   );
 }
 
+// Local dev (localhost/127.x) goes network-first for EVERYTHING so edited
+// files are never served stale; cache still backs an offline reload, which
+// is what makes localhost a faithful offline test bench.
+const DEV = ["localhost", "127.0.0.1", "::1", "[::1]"].includes(location.hostname);
+
+async function networkFirst(e) {
+  try {
+    const res = await fetch(e.request);
+    const copy = res.clone();
+    e.waitUntil(caches.open(CACHE_VERSION).then((c) => c.put(e.request, copy)));
+    return res;
+  } catch (_err) {
+    const cached = await caches.match(e.request, {
+      ignoreSearch: new URL(e.request.url).pathname === "/",
+    });
+    if (cached) return cached;
+    if (e.request.mode === "navigate") {
+      const home = await caches.match("./");
+      if (home) return home; // serve the app offline for any route
+    }
+    throw _err;
+  }
+}
+
 self.addEventListener("fetch", (e) => {
   const url = new URL(e.request.url);
   if (e.request.method !== "GET" || url.origin !== location.origin) return;
 
-  if (isData(url)) {
-    // fresh first, cached when offline
-    e.respondWith(
-      fetch(e.request)
-        .then((res) => {
-          const copy = res.clone();
-          caches.open(CACHE_VERSION).then((c) => c.put(e.request, copy));
-          return res;
-        })
-        .catch(() => caches.match(e.request)),
-    );
+  if (DEV || isData(url)) {
+    e.respondWith(networkFirst(e));
     return;
   }
 
   // shell + assets: cache-first
   e.respondWith(
-    caches.match(e.request, { ignoreSearch: url.pathname === "/" }).then(
-      (hit) =>
-        hit ||
-        fetch(e.request).then((res) => {
-          const copy = res.clone();
-          caches.open(CACHE_VERSION).then((c) => c.put(e.request, copy));
-          return res;
-        }),
-    ),
+    caches.match(e.request, { ignoreSearch: url.pathname === "/" }).then((hit) => {
+      if (hit) return hit;
+      return fetch(e.request).then((res) => {
+        const copy = res.clone();
+        e.waitUntil(caches.open(CACHE_VERSION).then((c) => c.put(e.request, copy)));
+        return res;
+      });
+    }),
   );
 });

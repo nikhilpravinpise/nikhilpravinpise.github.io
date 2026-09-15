@@ -85,10 +85,11 @@ const env = {
       return false;
     }
   },
-  // keep the address bar shareable: every run updates #command
-  syncHash: (name) => {
+  // keep the address bar shareable: every run updates #command (args kept,
+  // so `theme light` deep-links as #theme%20light)
+  syncHash: (raw) => {
     try {
-      history.replaceState(null, "", `#${encodeURIComponent(name)}`);
+      history.replaceState(null, "", `#${encodeURIComponent(raw)}`);
     } catch (_e) {
       /* history API unavailable */
     }
@@ -244,11 +245,13 @@ async function boot() {
   updateScrollHints();
 }
 
-// offline support: real cached data, not just the baked snapshot
+// offline support: real cached data, not just the baked snapshot.
+// Registered on any http(s) origin - sw.js passes through network-first on
+// localhost so dev edits are never served stale.
 if (
   typeof navigator !== "undefined" &&
   navigator.serviceWorker &&
-  location.hostname.endsWith("github.io")
+  /^https?:$/.test(location.protocol)
 ) {
   navigator.serviceWorker.register("sw.js").catch(() => {});
 }

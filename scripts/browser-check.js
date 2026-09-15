@@ -140,6 +140,30 @@ async function main() {
   }
   await page.screenshot({ path: path.join(SHOTS, "desktop-final.png") });
 
+  // "works offline" for real: SW registers, precaches the shell, then an
+  // offline reload must still render the app (deep link included)
+  const swReady = await page.evaluate(async () => {
+    if (!("serviceWorker" in navigator)) return false;
+    const reg = await navigator.serviceWorker.ready;
+    return !!reg;
+  });
+  check("service worker registers", swReady);
+  if (swReady) {
+    await page.setOfflineMode(true);
+    await page.reload({ waitUntil: "domcontentloaded" });
+    const offline = await page.evaluate(async () => {
+      await window.__appReady;
+      return {
+        lines: document.querySelectorAll("#term .line").length,
+        heatmap: !!document.querySelector(".heatmap"),
+      };
+    });
+    check("offline reload renders app from cache", offline.lines > 0, `${offline.lines} lines`);
+    check("offline heatmap renders from cached data", offline.heatmap);
+    await page.screenshot({ path: path.join(SHOTS, "offline.png") });
+    await page.setOfflineMode(false);
+  }
+
   check("zero console/page errors", errors.length === 0, errors.slice(0, 3).join("; "));
   check("zero failed requests", failedReqs.length === 0, failedReqs.slice(0, 3).join("; "));
 

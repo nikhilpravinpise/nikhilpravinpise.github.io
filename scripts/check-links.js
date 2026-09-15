@@ -9,18 +9,29 @@ import fs from "node:fs";
 import path from "node:path";
 
 const ROOT = process.cwd();
+function listJs(dir, prefix) {
+  const out = [];
+  for (const ent of fs.readdirSync(dir, { withFileTypes: true })) {
+    if (ent.isDirectory()) out.push(...listJs(path.join(dir, ent.name), `${prefix}${ent.name}/`));
+    else if (ent.name.endsWith(".js")) out.push(prefix + ent.name);
+  }
+  return out;
+}
+
 const SCAN_FILES = [
   "index.html",
   "404.html",
   "README.md",
+  "AGENTS.md",
   "manifest.webmanifest",
   "sw.js",
-  ...fs.readdirSync(path.join(ROOT, "assets")).filter((f) => f.endsWith(".js")).map((f) => `assets/${f}`),
+  ...listJs(path.join(ROOT, "assets"), "assets/"),
 ];
 
 // hosts/paths that are not user-facing links or reject bots
 const IGNORE_URLS = [
   /^http:\/\/x\//, // dev-server URL parser base
+  /^https?:\/\/(localhost|127\.0\.0\.1|\[?::1\]?)(:|\/|$)/, // local dev URLs in docs
   /^https:\/\/api\.github\.com\//, // POST-only GraphQL endpoint
   /^https:\/\/github\.com\/cli\//, // gh cli metadata strings
   /^https:\/\/schema\.org/, // JSON-LD context identifier, not a link

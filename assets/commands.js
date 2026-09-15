@@ -109,12 +109,12 @@ export function createCommands(ctx) {
       summary: "live GitHub contribution heatmap",
       run() {
         if (!state.data) {
-          line(`<span class="out-dim">loading contribution data...</span>`);
+          line(`<span class="out-dim">${state.dataError ? "contribution data unavailable - check connection" : "loading contribution data..."}</span>`);
           return;
         }
         const d = state.data;
         line(
-          `<span class="out-dim">${d.total_contributions.toLocaleString()} contributions · ${d.range.start} -&gt; ${d.range.end}${state.dataIsFallback ? " · offline snapshot" : ""}</span>`,
+          `<span class="out-dim">${d.total_contributions.toLocaleString()} contributions · ${escapeHtml(d.range.start)} -&gt; ${escapeHtml(d.range.end)}${state.dataIsFallback ? " · offline snapshot" : ""}</span>`,
         );
         const heatmap = buildHeatmap(d, env.tooltip);
         term.append(heatmap);
@@ -127,15 +127,15 @@ export function createCommands(ctx) {
       summary: "current, longest, and active stats",
       run() {
         if (!state.data) {
-          line(`<span class="out-dim">loading contribution data...</span>`);
+          line(`<span class="out-dim">${state.dataError ? "contribution data unavailable - check connection" : "loading contribution data..."}</span>`);
           return;
         }
         const d = state.data;
-        line(`<span class="out-green">current streak:</span>  ${d.current_streak.length} days (${d.current_streak.start || "none"} -&gt; ${d.current_streak.end || "none"})`);
-        line(`<span class="out-green">longest streak:</span>  ${d.longest_streak.length} days (${d.longest_streak.start || "none"} -&gt; ${d.longest_streak.end || "none"})`);
-        line(`<span class="out-green">best day:</span>       ${d.best_day.count} contributions${d.best_day.count > 0 ? " on " + d.best_day.date : ""}`);
+        line(`<span class="out-green">current streak:</span>  ${d.current_streak.length} days (${escapeHtml(d.current_streak.start || "none")} -&gt; ${escapeHtml(d.current_streak.end || "none")})`);
+        line(`<span class="out-green">longest streak:</span>  ${d.longest_streak.length} days (${escapeHtml(d.longest_streak.start || "none")} -&gt; ${escapeHtml(d.longest_streak.end || "none")})`);
+        line(`<span class="out-green">best day:</span>       ${d.best_day.count} contributions${d.best_day.count > 0 ? " on " + escapeHtml(d.best_day.date) : ""}`);
         line(`<span class="out-green">active days:</span>    ${d.active_days || 0} days (${d.avg_per_active_day || 0} avg / active day)`);
-        line(`<span class="out-green">total:</span>          ${d.total_contributions.toLocaleString()} contributions since ${d.range.start}`);
+        line(`<span class="out-green">total:</span>          ${d.total_contributions.toLocaleString()} contributions since ${escapeHtml(d.range.start)}`);
       },
     },
     {
@@ -143,7 +143,7 @@ export function createCommands(ctx) {
       summary: "monthly contribution bar chart",
       run() {
         if (!state.data) {
-          line(`<span class="out-dim">loading contribution data...</span>`);
+          line(`<span class="out-dim">${state.dataError ? "contribution data unavailable - check connection" : "loading contribution data..."}</span>`);
           return;
         }
         line(`<span class="out-white">monthly contributions</span>`);
@@ -242,8 +242,8 @@ export function createCommands(ctx) {
           ["Editor", PROFILE.system.editor],
           ["Location", PROFILE.system.location],
           ["Languages", "Python · TypeScript · Dart · C++"],
-          ["Contributions", d ? `${d.total_contributions.toLocaleString()} in the last year` : "loading..."],
-          ["Streak", d ? `${d.current_streak.length}d current · ${d.longest_streak.length}d best` : "loading..."],
+          ["Contributions", d ? `${d.total_contributions.toLocaleString()} in the last year` : state.dataError ? "unavailable" : "loading..."],
+          ["Streak", d ? `${d.current_streak.length}d current · ${d.longest_streak.length}d best` : state.dataError ? "unavailable" : "loading..."],
         ];
         const artW = Math.max(...NEOFETCH_ART.map((l) => l.length)) + 4;
         const rows = Math.max(NEOFETCH_ART.length, info.length);
@@ -392,6 +392,7 @@ export function createCommands(ctx) {
     open: Object.keys(PROFILE.links),
     copy: ["email", ...Object.keys(PROFILE.links)],
     theme: THEMES.map((t) => t.id),
+    history: ["-c"],
   };
 
   function run(raw, opts = {}) {
@@ -413,7 +414,13 @@ export function createCommands(ctx) {
     const entry = byName.get(key);
     if (entry) {
       const result = entry.run(args);
-      if (syncHash) env.syncHash(entry.name);
+      if (syncHash) env.syncHash(trimmed);
+      // async commands (copy) must never surface as unhandled rejections
+      if (result && typeof result.catch === "function") {
+        return result.catch((e) => {
+          line(`<span class="out-dim">${escapeHtml(String(e && e.message || e))}</span>`);
+        });
+      }
       return result;
     } else {
       const suggestion = [...byName.keys()]

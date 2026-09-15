@@ -76,6 +76,19 @@ test("validateContributions: rejects future generated_at", () => {
   assert.ok(validateContributions(bad).some((i) => i.includes("future")));
 });
 
+test("validateContributions: malformed day entries report, never throw", () => {
+  for (const poison of [[null], [undefined], ["2026-01-01"], [{ date: "01/02", count: 1 }], [{ date: "2026-01-01", count: -1 }], [{ date: "2026-01-01", count: 1.5 }]]) {
+    const bad = { ...base(), days: poison };
+    const issues = validateContributions(bad); // must not throw
+    assert.ok(issues.length > 0, `no issue reported for ${JSON.stringify(poison)}`);
+  }
+});
+
+test("validateRepos: malformed user_created_at is caught when present", () => {
+  const doc = { username: "u", generated_at: "2026-01-01T00:00:00Z", user_created_at: "not-a-date", repos: [] };
+  assert.ok(validateRepos(doc).some((i) => i.includes("user_created_at")));
+});
+
 test("validateRepos: catches malformed entries", () => {
   const good = { username: "u", generated_at: "2026-01-01T00:00:00Z", repos: [] };
   assert.deepEqual(validateRepos(good), []);

@@ -4,6 +4,7 @@
 // when the fetch fails (so the snapshot costs nothing on the happy path).
 
 import { quantileThresholds, levelFor } from "./lib/stats.js";
+import { escapeHtml } from "./terminal.js";
 
 export const LIVE_DATA_URL = "./data/contributions.json";
 
@@ -15,9 +16,15 @@ export async function loadContributions(state) {
     if (!json || !Array.isArray(json.days)) throw new Error("bad payload");
     state.data = json;
   } catch (_e) {
-    const fallback = await import("./fallback.js");
-    state.data = fallback.contributions;
-    state.dataIsFallback = true;
+    try {
+      const fallback = await import("./fallback.js");
+      state.data = fallback.contributions;
+      state.dataIsFallback = true;
+    } catch (_e2) {
+      // truly offline first visit - boot must still finish; commands that
+      // need data show an honest "unavailable" instead of loading forever
+      state.dataError = true;
+    }
   }
   return state.data;
 }
@@ -80,11 +87,12 @@ const WEEKDAY_LABELS = ["", "Mon", "", "Wed", "", "Fri", ""];
  * contain null padding cells.
  */
 export function buildColumns(days) {
-  const first = new Date(days[0].date + "T00:00:00");
+  // UTC throughout - matches the validator and dodges local-time DST edges
+  const first = new Date(days[0].date + "T00:00:00Z");
   const cols = [];
-  let col = new Array(first.getDay()).fill(null);
+  let col = new Array(first.getUTCDay()).fill(null);
   for (const d of days) {
-    const weekday = new Date(d.date + "T00:00:00").getDay();
+    const weekday = new Date(d.date + "T00:00:00Z").getUTCDay();
     while (col.length < weekday) col.push(null);
     col.push(d);
     if (col.length === 7) { cols.push(col); col = []; }
@@ -267,7 +275,7 @@ export function buildGraph(data) {
   const max = Math.max(1, ...monthly.map((m) => m.total));
   const rows = monthly.map(({ month, total }) => {
     const len = total === 0 ? 0 : Math.max(1, Math.round((total / max) * GRAPH_WIDTH));
-    return `${month}  <span class="out-green">${BAR.repeat(len)}</span> <span class="out-dim">${total}</span>`;
+    return `${escapeHtml(String(month))}  <span class="out-green">${BAR.repeat(len)}</span> <span class="out-dim">${total}</span>`;
   });
   return rows;
 }

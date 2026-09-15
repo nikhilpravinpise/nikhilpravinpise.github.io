@@ -15,8 +15,13 @@ export async function loadRepos(state) {
     if (!json || !Array.isArray(json.repos)) throw new Error("bad payload");
     state.reposDoc = json;
   } catch (_e) {
-    const fallback = await import("./fallback.js");
-    state.reposDoc = fallback.repos;
+    try {
+      const fallback = await import("./fallback.js");
+      state.reposDoc = fallback.repos;
+      state.reposIsFallback = true;
+    } catch (_e2) {
+      state.reposError = true;
+    }
   }
   return state.reposDoc;
 }
@@ -26,11 +31,13 @@ const HEX_COLOR = /^#[0-9a-fA-F]{3,8}$/;
 export function renderRepos(state, term, now = Date.now()) {
   const doc = state.reposDoc;
   if (!doc) {
-    term.line(`<span class="out-dim">loading repository data...</span>`);
+    term.line(
+      `<span class="out-dim">${state.reposError ? "repository data unavailable - check connection" : "loading repository data..."}</span>`,
+    );
     return;
   }
   term.line(
-    `<span class="out-dim">top public repositories · updated ${escapeHtml(doc.generated_at.slice(0, 10))}</span>`,
+    `<span class="out-dim">top public repositories · updated ${escapeHtml(doc.generated_at.slice(0, 10))}${state.reposIsFallback ? " · offline snapshot" : ""}</span>`,
   );
   for (const r of doc.repos) {
     const stars = r.stars > 0 ? ` ★${r.stars}` : "";

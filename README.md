@@ -78,10 +78,12 @@ npm test           # node:test suite: math, commands, input, heatmap,
 npm run lint       # eslint
 npm run validate   # checks data/*.json invariants + fallback parity
 npm run check:links  # HEAD-checks every external URL and local file ref
+npm run check:browser # real-Chrome smoke: every command, mobile layout,
+                      # themes, deep links, and a true offline reload
 npm run check      # lint + test + validate
 ```
 
-CI runs all of the above plus `html-validate` on every push/PR, on Node 22 and 24.
+CI runs lint, tests, data validation and `html-validate` on every push/PR, on Node 22 and 24. `check:browser` runs locally (needs a Chrome/Edge install).
 
 ## Regenerating data / artwork
 

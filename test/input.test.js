@@ -1,6 +1,7 @@
 import { test, before, after } from "node:test";
 import assert from "node:assert/strict";
 import { bootApp, key, typeCommand, termText } from "./helpers/dom.js";
+import { createCommands } from "../assets/commands.js";
 
 let ctx;
 before(async () => {
@@ -120,7 +121,23 @@ test("deep link ?cmd=projects auto-runs the command", async () => {
 test("deep link #streak auto-runs the command", async () => {
   const deep = await bootApp({ url: "https://nikhilpravinpise.github.io/#streak" });
   const t = termText(deep.term).join("\n");
-  assert.ok(t.includes("streak"));
+  // must match actual streak-command output, not the stat card label
+  assert.ok(t.includes("current streak:"), "deep link did not run streak");
+  assert.ok(t.includes("longest streak:"));
+  deep.restore();
+});
+
+test("malformed percent-encoded hash does not break boot", async () => {
+  const deep = await bootApp({ url: "https://nikhilpravinpise.github.io/#%E0%A4%A" });
+  const t = termText(deep.term).join("\n");
+  assert.ok(t.includes("connected to github.com"), "boot aborted on bad hash");
+  assert.ok(!t.includes("command not found"));
+  deep.restore();
+});
+
+test("deep link with args: #theme%20synthwave applies the theme", async () => {
+  const deep = await bootApp({ url: "https://nikhilpravinpise.github.io/#theme%20synthwave" });
+  assert.equal(deep.window.document.documentElement.dataset.theme, "synthwave");
   deep.restore();
 });
 
@@ -134,4 +151,25 @@ test("bogus deep link does not print 'command not found'", async () => {
 test("running a command syncs the location hash", () => {
   typeCommand(ctx.input, ctx.window, "skills");
   assert.equal(ctx.window.location.hash, "#skills");
+});
+
+test("hash sync keeps args so deep links round-trip", () => {
+  typeCommand(ctx.input, ctx.window, "theme synthwave");
+  assert.equal(ctx.window.location.hash, "#theme%20synthwave");
+});
+
+test("async command failures print to terminal instead of throwing", async () => {
+  const out = [];
+  const term = { line: (html) => out.push(html), echo() {} };
+  const cmds = createCommands({
+    term,
+    state: { history: [], historyIndex: 0, historyDraft: "" },
+    env: {
+      copyText: () => Promise.reject(new Error("denied")),
+      syncHash() {},
+      persistHistory() {},
+    },
+  });
+  await assert.doesNotReject(() => cmds.run("copy email"));
+  assert.ok(out.some((l) => l.includes("denied")), "error was not surfaced");
 });
