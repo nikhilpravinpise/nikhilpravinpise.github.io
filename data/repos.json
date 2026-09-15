@@ -1,0 +1,95 @@
+{
+  "username": "nikhilpravinpise",
+  "generated_at": "2026-09-15T09:53:26.154Z",
+  "user_created_at": "2021-08-11T07:03:03Z",
+  "repos": [
+    {
+      "name": "FreelanceMCP",
+      "description": "🚀 AI-powered freelance gig aggregator MCP server for Claude Desktop. Search gigs, generate proposals, negotiate rates & optimize profiles with ChatGroq AI.",
+      "url": "https://github.com/nikhilpravinpise/FreelanceMCP",
+      "stars": 7,
+      "forks": 0,
+      "archived": false,
+      "pushed_at": "2025-11-18T18:34:53Z",
+      "language": "Python",
+      "language_color": "#3572A5"
+    },
+    {
+      "name": "ML-Specialization",
+      "description": "📚 Solution notebooks for Andrew Ng's Machine Learning Specialization on Coursera | Supervised Learning, Neural Networks, Unsupervised Learning, Recommender Systems & Reinforcement Learning | Python, TensorFlow, scikit-learn",
+      "url": "https://github.com/nikhilpravinpise/ML-Specialization",
+      "stars": 4,
+      "forks": 2,
+      "archived": false,
+      "pushed_at": "2025-11-27T09:55:41Z",
+      "language": "Jupyter Notebook",
+      "language_color": "#DA5B0B"
+    },
+    {
+      "name": "Medium-Agent",
+      "description": "📚 Turn Medium articles into audio, summaries, and AI reports. Features robust scraping with anti-bot bypass, Claude Desktop (MCP) integration, and a Gradio UI.",
+      "url": "https://github.com/nikhilpravinpise/Medium-Agent",
+      "stars": 2,
+      "forks": 0,
+      "archived": false,
+      "pushed_at": "2026-04-25T06:50:58Z",
+      "language": "Python",
+      "language_color": "#3572A5"
+    },
+    {
+      "name": "VidyaSetu",
+      "description": "📚 Comprehensive digital platform designed to empower students, faculty, and administrators in managing academic portfolios, achievements, and institutional accreditation processes",
+      "url": "https://github.com/nikhilpravinpise/VidyaSetu",
+      "stars": 2,
+      "forks": 0,
+      "archived": false,
+      "pushed_at": "2025-10-31T15:16:24Z",
+      "language": "JavaScript",
+      "language_color": "#f1e05a"
+    },
+    {
+      "name": "nikhilpravinpise",
+      "description": "github profile readme",
+      "url": "https://github.com/nikhilpravinpise/nikhilpravinpise",
+      "stars": 2,
+      "forks": 0,
+      "archived": false,
+      "pushed_at": "2026-09-14T10:41:28Z",
+      "language": "Python",
+      "language_color": "#3572A5"
+    },
+    {
+      "name": "Mediguard-Chatbot-Frontend",
+      "description": "🏥 The modern React landing page for MediGuard AI—a HIPAA-compliant WhatsApp bot for blood test analysis and disease prediction.",
+      "url": "https://github.com/nikhilpravinpise/Mediguard-Chatbot-Frontend",
+      "stars": 1,
+      "forks": 0,
+      "archived": false,
+      "pushed_at": "2026-01-05T18:21:30Z",
+      "language": "TypeScript",
+      "language_color": "#3178c6"
+    },
+    {
+      "name": "Pramana.AI",
+      "description": "🧬 AI-powered biomedical research platform built with LangGraph, Groq, and React 19. Features 5 specialized agents, real-time streaming, and Model Context Protocol (MCP) integration.",
+      "url": "https://github.com/nikhilpravinpise/Pramana.AI",
+      "stars": 1,
+      "forks": 1,
+      "archived": false,
+      "pushed_at": "2026-01-20T14:19:29Z",
+      "language": "TypeScript",
+      "language_color": "#3178c6"
+    },
+    {
+      "name": "MediGuard-Chatbot",
+      "description": "🤖 An automated WhatsApp bot that enables programmatic messaging, command handling, and custom interactions using WhatsApp Web API",
+      "url": "https://github.com/nikhilpravinpise/MediGuard-Chatbot",
+      "stars": 1,
+      "forks": 0,
+      "archived": false,
+      "pushed_at": "2026-01-05T18:20:58Z",
+      "language": "Python",
+      "language_color": "#3572A5"
+    }
+  ]
+}
