@@ -1,6 +1,6 @@
 {
   "username": "nikhilpravinpise",
-  "generated_at": "2026-11-27T12:17:58.761Z",
+  "generated_at": "2026-11-28T11:43:24.512Z",
   "user_created_at": "2021-08-11T07:03:03Z",
   "repos": [
     {
@@ -48,17 +48,6 @@
       "language_color": "#f1e05a"
     },
     {
-      "name": "nikhilpravinpise",
-      "description": "github profile readme",
-      "url": "https://github.com/nikhilpravinpise/nikhilpravinpise",
-      "stars": 2,
-      "forks": 0,
-      "archived": false,
-      "pushed_at": "2026-11-26T15:19:00Z",
-      "language": "Python",
-      "language_color": "#3572A5"
-    },
-    {
       "name": "Synapse",
       "description": "🔗 Decentralized on-chain AI model marketplace — mint model weights as NFTs, stake to serve inference, settle every call on Ethereum Sepolia. Full-stack monorepo: Solidity + FastAPI + Next.js + Ponder + Lit Protocol.",
       "url": "https://github.com/nikhilpravinpise/Synapse",
@@ -90,6 +79,17 @@
       "pushed_at": "2026-01-20T14:19:29Z",
       "language": "TypeScript",
       "language_color": "#3178c6"
+    },
+    {
+      "name": "MediGuard-Chatbot",
+      "description": "🤖 An automated WhatsApp bot that enables programmatic messaging, command handling, and custom interactions using WhatsApp Web API",
+      "url": "https://github.com/nikhilpravinpise/MediGuard-Chatbot",
+      "stars": 1,
+      "forks": 0,
+      "archived": false,
+      "pushed_at": "2026-01-05T18:20:58Z",
+      "language": "Python",
+      "language_color": "#3572A5"
     }
   ]
 }
